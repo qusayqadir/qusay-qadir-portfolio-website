@@ -43,7 +43,7 @@ export function ThreeCircleImages({
 			<button
 				type="button"
 				aria-label="Open left image"
-				className="absolute left-[6%] md:left-[10%] top-1/2 -translate-y-1/2 rounded-full overflow-hidden shadow-xl ring-1 ring-white/30 z-0 translate-x-2 focus:outline-none"
+				className="absolute left-[6%] md:left-[10%] top-1/2 -translate-y-1/2 rounded-full overflow-hidden shadow-xl ring-1 ring-white/30 z-0 translate-x-2 focus:outline-none cursor-pointer"
 				style={sideWH}
 				onClick={onLeftClick}
 			>
@@ -54,7 +54,7 @@ export function ThreeCircleImages({
 			<button
 				type="button"
 				aria-label="Open center image"
-				className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full overflow-hidden shadow-2xl ring-2 ring-white/50 z-10 focus:outline-none"
+				className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full overflow-hidden shadow-2xl ring-2 ring-white/50 z-10 focus:outline-none  cursor-pointer"
 				style={centerWH}
 				onClick={onCenterClick}
 			>
@@ -65,7 +65,7 @@ export function ThreeCircleImages({
 			<button
 				type="button"
 				aria-label="Open right image"
-				className="absolute right-[6%] md:right-[10%] top-1/2 -translate-y-1/2 rounded-full overflow-hidden shadow-xl ring-1 ring-white/30 z-0 -translate-x-2 focus:outline-none"
+				className="absolute right-[6%] md:right-[10%] top-1/2 -translate-y-1/2 rounded-full overflow-hidden shadow-xl ring-1 ring-white/30 z-0 -translate-x-2 focus:outline-none  cursor-pointer"
 				style={sideWH}
 				onClick={onRightClick}
 			>
