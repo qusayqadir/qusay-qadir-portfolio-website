@@ -122,7 +122,7 @@ function App() {
                 When I am not building, I play all kinds of racquet sports, be an expressive cinephile (the departed, king of comedy, and the town are my favorites), and lose a nights sleep making latte art with my new espresso machine. 
                 <br/>
                 <br/> 
-                Seeking Backend Softawre Engineering, Data Engienering, or AI dev opportunities for <strong>Summer 2026</strong> and <strong>Fall 2026</strong> -- reach out! 
+                Seeking Backend Software Engineering, Data Engineering, or AI dev opportunities for <strong>Summer 2026</strong> and <strong>Fall 2026</strong> -- reach out! 
               </p>
               </div>
             </div>
