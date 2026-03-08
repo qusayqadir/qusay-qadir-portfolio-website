@@ -63,7 +63,7 @@ export function NavigationMenuDemo() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem> */}
-        <NavigationMenuItem className="hidden md:block">
+        <NavigationMenuItem>
           <NavigationMenuTrigger>Socials & Connect</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[200px] gap-4">
@@ -82,7 +82,7 @@ export function NavigationMenuDemo() {
           </NavigationMenuContent>
         </NavigationMenuItem>
         {/* Resume: opens PDF in a new tab */}
-        <NavigationMenuItem className="hidden md:block">
+        <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
             <a href={resumePdf} target="_blank" rel="noopener noreferrer">Resume</a>
           </NavigationMenuLink>

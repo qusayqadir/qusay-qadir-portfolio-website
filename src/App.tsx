@@ -4,8 +4,10 @@ import Footer from "@/components/layout/Footer"
 import AccordionTabs from "@/components/shadcn-studio/accordion/accordion-11"
 import { ThreeCircleImages } from "./components/layout/Three-Circle-Images"
 import { ThemeProvider } from "@/components/ui/theme-provider"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 
 import { useState } from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -17,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 function App() {
+  const isMobile = useIsMobile()
   const [openLeft, setOpenLeft] = useState(false)
   const [openCenter, setOpenCenter] = useState(false)
   const [openRight, setOpenRight] = useState(false)
@@ -41,9 +44,9 @@ function App() {
               onLeftClick={() => setOpenLeft(true)}
               onCenterClick={() => setOpenCenter(true)}
               onRightClick={() => setOpenRight(true)}
-              centerSize={360}
-              sideSize={200}
-              containerHeight={420}
+              centerSize={isMobile ? 200 : 360}
+              sideSize={isMobile ? 100 : 200}
+              containerHeight={isMobile ? 260 : 420}
             />
 
             {/* Left circle modal */}
@@ -111,15 +114,31 @@ function App() {
             </div>
           </div>
           
-            <div className="flex justify-center px-4">
-              <div className="w-[700px] text-left space-y-3">
+            <div className="flex justify-center w-full px-4">
+              <div className="w-[100%] max-w-4xl h-max grid gap-4 scroll-mt-24">
               <p className="whitespace-normal break-words leading-relaxed">
                 Hello, I'm Qusay, based in Toronto, Canada, I am currently a Software Engineering Intern @ RBC Borealis working on building a scalable data platform for internal consumers. 
                 I am a Software Engineering student (minor in math) @ McMaster University with a keen interest in system design, databases, networks (specifically GPU to GPU comm) and Agentic AI. 
                 Programming for me is a means to build solutions to problems in these domain and I am eager to continue to learn and <strong>build things I can take ownership for!</strong>  
                 <br/>
                 <br/> 
-                When I am not building, I play all kinds of racquet sports, be an expressive cinephile (the departed, king of comedy, and the town are my favorites), and lose a nights sleep making latte art with my new espresso machine. 
+                When I am not building, I play all kinds of racquet sports, be an expressive{" "}
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <strong className="cursor-pointer underline decoration-dotted underline-offset-2">cinephile</strong>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-72">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">My favorite films</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li>• The Departed</li>
+                        <li>• King of Comedy</li>
+                        <li>• The Town</li>
+                      </ul>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+                , and lose a nights sleep making latte art with my new espresso machine. 
                 <br/>
                 <br/> 
                 Seeking Backend Software Engineering, Data Engineering, or AI dev opportunities for <strong>Summer 2026</strong> and <strong>Fall 2026</strong> -- reach out! 
@@ -154,7 +173,7 @@ function App() {
                     for sub 1ms response time for the Auth Check of the API request, eliminating a latency bottleneck. 
                     <br/>
                     <br/>
-                    <strong>Tech Stack:</strong> Python, Go, NodeJS, ReactJS, Postman, Temporal, DBeaver
+                    <strong>Tech Stack:</strong> Python, Go, Claude Code, Postman, Temporal, DBeaver, RedHat OpenShift
                   </>
                 }
               />
