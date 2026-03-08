@@ -150,7 +150,7 @@ function App() {
             <div className="w-[100%] max-w-4xl h-max grid gap-4 scroll-mt-24">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Now</h2>
               <p className="whitespace-normal break-words leading-relaxed">
-                Outside of work, I'm training for a badminton tournament, building a custom HTTP framwork from a raw TCP server, upgrading this website, and studying for my AWS certification exam! 
+                Outside of work, I'm training for a badminton tournament, building a custom HTTP framework from a raw TCP server, upgrading this website, and studying for my AWS certification exam! 
                 Applying to jobs, listening to new music, doing interviews all the while trying to make the most of my last year of undergrad. 
 
               </p>
