@@ -99,7 +99,7 @@ const PROJECTS = [
     image: "/images/http-framework.png",
   },
   {
-    title: "Object Oriented - Snake Game",
+    title: "Object Oriented Principles Based - Snake Game",
     description:
       "",
     tags: ["C" ,"C++"],
