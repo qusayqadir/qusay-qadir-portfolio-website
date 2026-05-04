@@ -1,5 +1,5 @@
 import ButtonIconHoverDemo from '@/components/ui/button-04'
-import { Linkedin, Github } from 'lucide-react'
+import { Linkedin, Github, Instagram } from 'lucide-react'
 
 export const Footer = () => {
   return (
@@ -10,23 +10,14 @@ export const Footer = () => {
       </div>
       {/* Bottom-right: LinkedIn & GitHub icons */}
       <div className="absolute right-4 bottom-4 flex items-center gap-3">
-      <a
-          href="https://github.com/qusayqadir"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub profile"
-          className="text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
-        >
-          <Github className="w-6 h-6" />
+        <a href="https://github.com/qusayqadir" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-foreground/60 hover:text-foreground transition-colors">
+          <Github className="w-5 h-5" />
         </a>
-        <a
-          href="https://www.linkedin.com/in/qusay-qadir/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="LinkedIn profile"
-          className="text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
-        >
-          <Linkedin className="w-6 h-6" />
+        <a href="https://www.linkedin.com/in/qusay-qadir/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-foreground/60 hover:text-foreground transition-colors">
+          <Linkedin className="w-5 h-5" />
+        </a>
+        <a href="https://www.instagram.com/qusay.qadir/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-foreground/60 hover:text-foreground transition-colors">
+          <Instagram className="w-5 h-5" />
         </a>
       </div>
 

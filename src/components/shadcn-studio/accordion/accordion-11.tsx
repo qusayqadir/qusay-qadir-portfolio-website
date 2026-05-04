@@ -5,7 +5,7 @@ const items = [
     title: 'Developer Tools',
     content: (
       <>
-        <strong>Cloud Platforms:</strong> AWS (EC2, Kafka, Flink, Redis), GCP (Vertex Rag Engine, LookerStudio)
+        <strong>Cloud Platforms:</strong> AWS (EC2, Kafka, Flink, Redis), GCP (Vertex RAG Engine, LookerStudio)
         <br />
         <strong>Databases:</strong> PostgreSQL, MySQL, MongoDB, DBeaver
         <br />
@@ -19,7 +19,7 @@ const items = [
       <>
         <strong>Primary:</strong> Python, Java, SQL
         <br />
-        <strong>Also:</strong> Go, C/C++, JavaScript, Typescript, HTML/CSS, Dart
+        <strong>Also:</strong> Go, C/C++, JavaScript, HTML/CSS, Dart
       </>
     )
   },
@@ -27,7 +27,7 @@ const items = [
     title: 'Libraries & Frameworks',
     content: (
       <>
-        <strong>Backend:</strong> FastAPI, Django, LangChain, SpringBoot, NodeJS, PyTest/JUnit
+        <strong>Backend:</strong> FastAPI, Django, LangChain, SpringBoot, PyTest/JUnit
         <br />
         <strong>Data:</strong> Pandas, NumPy, TensorFlow, Apache Spark
       </>
