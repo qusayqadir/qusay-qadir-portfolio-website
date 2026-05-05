@@ -9,7 +9,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import resumePdf from "@/assets/Qusay_Qadir_McMasterUniversity_DataPlatformEngineer.pdf"
+import resumePdf from "@/assets/Qusay_Qadir_Backend_Data_SWE_Intern.pdf"
 import { ModeToggle } from "../ui/mode-toggle"
 import { cn } from "@/lib/utils"
 
