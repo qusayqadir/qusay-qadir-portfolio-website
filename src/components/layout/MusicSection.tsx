@@ -22,7 +22,7 @@ const MusicSection = () => {
       {TRACKS.map((track) => (
         <div
           key={track.title}
-          className="rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:scale-[1.02]"
+          className="rounded-xl overflow-hidden"
         >
           <iframe
             allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"

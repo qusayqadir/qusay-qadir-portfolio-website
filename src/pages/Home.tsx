@@ -3,7 +3,6 @@ import { Link } from "react-router-dom"
 import { ThreeCircleImages } from "@/components/layout/Three-Circle-Images"
 import FadeIn from "@/components/layout/FadeIn"
 import MusicSection from "@/components/layout/MusicSection"
-import MovieSection from "@/components/layout/MovieSection"
 import { useState, useRef, useCallback, useEffect, type RefObject } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { X } from "lucide-react"
@@ -348,7 +347,7 @@ function PhotoCard({
 const FAVE_FILMS = [
   { title: 'The Departed', note: 'Scorsese at his absolute peak' },
   { title: 'King of Comedy', note: 'The most underrated Scorsese film' },
-  { title: 'The Town', note: 'Affleck directing Affleck — works every time' },
+  { title: 'The Town', note: 'Affleck directed and acted film works every time' },
 ]
 
 export default function Home() {
@@ -514,10 +513,7 @@ export default function Home() {
         <FadeIn className="flex justify-center w-full px-4">
           <div className="flex flex-col gap-2 items-center">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Qusay Q.</h2>
-            <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Open to work · Fall 2026 &amp; Winter 2027
-            </span>
+            <span className="text-xs font-mono text-muted-foreground">Open to work · Fall 2026 &amp; Winter 2027</span>
           </div>
         </FadeIn>
 
@@ -530,19 +526,19 @@ export default function Home() {
               <br/>
               <br/>
               When I am not building, I play all kinds of racquet sports, be an expressive{" "}
-              <button
+              <span
                 onClick={() => setShowFilms(true)}
-                className="inline bg-red-600 text-white font-semibold px-2 py-0.5 rounded-full cursor-pointer hover:bg-red-700 transition-colors duration-150"
+                className="underline underline-offset-2 cursor-pointer"
               >
                 cinephile
-              </button>
+              </span>
               , and lose a nights sleep making latte art with my new{" "}
-              <button
+              <span
                 onClick={() => setShowEspresso(true)}
-                className="inline bg-red-600 text-white font-semibold px-2 py-0.5 rounded-full cursor-pointer hover:bg-red-700 transition-colors duration-150"
+                className="underline underline-offset-2 cursor-pointer"
               >
                 espresso machine
-              </button>
+              </span>
               .
               <br/>
               <br/>
@@ -566,13 +562,6 @@ export default function Home() {
           <div className="w-[100%] max-w-4xl h-max grid gap-4">
             <p className="text-sm text-muted-foreground font-mono tracking-widest uppercase">Music I'm listening to</p>
             <MusicSection />
-          </div>
-        </FadeIn>
-
-        <FadeIn className="flex justify-center w-full px-4">
-          <div className="w-[100%] max-w-4xl h-max grid gap-4">
-            <p className="text-sm text-muted-foreground font-mono tracking-widest uppercase">Movies I want to watch</p>
-            <MovieSection />
           </div>
         </FadeIn>
 

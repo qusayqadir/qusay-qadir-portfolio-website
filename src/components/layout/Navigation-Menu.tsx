@@ -48,6 +48,12 @@ export function NavigationMenuDemo() {
         </NavigationMenuItem>
 
         <NavigationMenuItem>
+          <NavigationMenuLink asChild className={linkClass("/contact")}>
+            <Link to="/contact">Contact</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
             <a href={resumePdf} target="_blank" rel="noopener noreferrer">Resume</a>
           </NavigationMenuLink>

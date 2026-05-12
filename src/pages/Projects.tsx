@@ -44,7 +44,7 @@ const TECH_ICONS: Record<string, string> = {
 function TechBadge({ tag }: { tag: string }) {
   const iconUrl = TECH_ICONS[tag]
   return (
-    <span className="flex items-center gap-1.5 text-[11px] font-mono tracking-wide px-2.5 py-1 rounded-full bg-muted text-muted-foreground border">
+    <span className="flex items-center gap-1.5 text-[11px] font-mono tracking-wide px-2 py-0.5 rounded bg-muted text-muted-foreground">
       {iconUrl && (
         <img src={iconUrl} alt={tag} className="w-3.5 h-3.5" />
       )}
@@ -188,8 +188,8 @@ export default function Projects() {
                       </div>
                     )}
                     {project.wip && (
-                      <span className="absolute top-3 left-3 text-[10px] font-mono tracking-wide px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300">
-                        Preview: Changes Revealed Soon
+                      <span className="absolute top-3 left-3 text-[10px] font-mono tracking-wide text-muted-foreground">
+                        WIP
                       </span>
                     )}
                   </div>
