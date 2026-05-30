@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 import { useEffect } from "react"
+import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { NavigationMenuDemo } from "@/components/layout/Navigation-Menu"
 import Home from "@/pages/Home"
@@ -51,6 +52,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
         </Routes>
       </BrowserRouter>
+      <Analytics />
     </ThemeProvider>
   )
 }
