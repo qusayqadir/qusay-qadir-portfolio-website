@@ -1,601 +1,495 @@
-import Footer from "@/components/layout/Footer"
-import { Link } from "react-router-dom"
-import { ThreeCircleImages } from "@/components/layout/Three-Circle-Images"
-import FadeIn from "@/components/layout/FadeIn"
-import MusicSection from "@/components/layout/MusicSection"
-import { useState, useRef, useCallback, useEffect, type RefObject } from "react"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { X } from "lucide-react"
+import { useState, useEffect, useRef } from 'react'
+import resumePdf from "@/assets/Qusay_Qadir_Backend_Data_SWE_Intern.pdf"
 
-type PhotoKey = 'left' | 'center' | 'right'
+const NAV_SECTIONS = ['about', 'experience', 'projects', 'resume', 'contact']
 
-const PHOTO_INFO: Record<PhotoKey, {
-  num: string
-  color: string
-  title: string
-  rows: { label: string; text: string }[]
-}> = {
-  left: {
-    num: '1',
-    color: '#F97316',
-    title: 'The tie obsession',
-    rows: [
-      { label: 'E. Marinella', text: 'Archivio 1942, Naples, hand stitched, 0 retail stores worldwide' },
-      { label: 'Hermès', text: 'Crazy Poney, Bleu Marine (unreleased), says a lot about my time on their website' },
-    ],
-  },
-  center: {
-    num: '2',
-    color: '#3B82F6',
-    title: 'Qusay @ Geneva',
-    rows: [
-      { label: 'The trip', text: 'Solo backpacking across Europe, summer 2025, not for some lame excuse myself but see some new places.' },
-      { label: 'Route', text: 'London → Geneva → Interlaken → Amsterdam → Munich → Prague → Berlin → Dublin' },
-    ],
-  },
-  right: {
-    num: '3',
-    color: '#10B981',
-    title: 'GoTrain dependence',
-    rows: [
-      { label: 'The commute', text: 'Daily trek to RBC Borealis in Toronto where I listen podcasts until I nod off' },
-      { label: 'Dream city', text: "If I had to commute anywhere, it'd be New York there is no doubt about it" },
-    ],
-  },
-}
-
-// Seeded pseudo-random in [-1, 1] — stable across renders, no extra dep
-function seededRand(seed: number): number {
-  const x = Math.sin(seed + 1) * 10000
-  return (x - Math.floor(x)) * 2 - 1
-}
-
-// Full-viewport fixed SVG that draws a bezier arrow from the info card to the photo.
-// Rendered as a sibling of PhotoCard so it escapes the card's bounds entirely.
-// Both components mount in the same render; refs are committed before any useEffect fires.
-function ArrowOverlay({
-  photo,
-  photoRef,
-  cardRef,
-  color,
-}: {
-  photo: PhotoKey
-  photoRef: RefObject<HTMLButtonElement | null>
-  cardRef:  RefObject<HTMLDivElement  | null>
-  color: string
-}) {
-  const mainRef = useRef<SVGPathElement>(null)
-  const h1Ref   = useRef<SVGPathElement>(null)
-  const h2Ref   = useRef<SVGPathElement>(null)
-  // Tracks whether the draw animation has already played (to avoid replaying on resize)
-  const hasAnimatedRef = useRef(false)
-
-  type Paths = { main: string; h1: string; h2: string }
-  const [paths, setPaths] = useState<Paths | null>(null)
-
-  // Compute path from live DOM measurements.
-  // Left/right: two-segment cubic Bézier with a lasso loop, landing on the photo's side edge.
-  // Center: simple quadratic arc.
-  const computePaths = useCallback(() => {
-    const photoEl = photoRef.current
-    const card    = cardRef.current
-    if (!photoEl || !card) return
-
-    const pr = photoEl.getBoundingClientRect()
-    const cr = card.getBoundingClientRect()
-
-    // Start: top-left corner of the card
-    const sx = cr.left + 20
-    const sy = cr.top + 8
-    const hs = 10
-
-    let mainD: string, h1D: string, h2D: string
-
-    if (photo === 'center') {
-      const ex = pr.left + pr.width / 2
-      const ey = pr.bottom
-      const qx = (sx + ex) / 2 + 50
-      const qy = (sy + ey) / 2
-      mainD = `M ${sx} ${sy} Q ${qx} ${qy} ${ex} ${ey}`
-      const tdx = ex - qx, tdy = ey - qy, tl = Math.hypot(tdx, tdy) || 1
-      const nx = tdx / tl, ny = tdy / tl
-      h1D = `M ${ex} ${ey} L ${ex - nx*hs + ny*hs*0.45} ${ey - ny*hs - nx*hs*0.45}`
-      h2D = `M ${ex} ${ey} L ${ex - nx*hs - ny*hs*0.45} ${ey - ny*hs + nx*hs*0.45}`
-    } else {
-      const photoR  = pr.height / 2
-      const photoCY = pr.top + photoR
-
-      // Deterministic wobble: each control point gets a ±4px offset seeded by photo key.
-      // Different seed bases (10 vs 20) give each photo its own stable hand-drawn character.
-      const seedBase = photo === 'right' ? 10 : 20
-      const w = (n: number, amp = 4) => seededRand(seedBase + n) * amp
-
-      let pathSx: number  // start x — differs per side (see comment in right branch)
-      let ex: number, ey: number
-      let loopX: number, loopY: number
-      let cp1x: number, cp1y: number, cp2x: number, cp2y: number
-      let cp3x: number, cp3y: number, cp4x: number, cp4y: number
-
-      if (photo === 'right') {
-        // Land on right edge (3 o'clock), arrowhead points inward (leftward)
-        ex = pr.right - 4
-        ey = photoCY
-
-        // Card left edge nearly overlaps photo right edge (~10px apart at typical widths),
-        // so card top-LEFT gives a near-vertical degenerate path. Use card top-RIGHT
-        // instead — creates ~270px horizontal separation, matching orange's geometry.
-        pathSx = cr.right - 20
-
-        loopX = ex + 80
-        loopY = ey - photoR * 1.2
-
-        cp1x = pathSx - 30;  cp1y = sy - 100      // pull left and up from card's right area
-        cp2x = loopX + 60;   cp2y = loopY + 50    // arrive at apex from the right
-        cp3x = loopX + 110;  cp3y = loopY - 25    // far right → visible lasso arc
-        cp4x = ex + 55;      cp4y = ey - 10       // approach from right → arrowhead points inward
-      } else {
-        // Land on left edge (9 o'clock), arrowhead points inward (rightward)
-        ex = pr.left + 4
-        ey = photoCY
-
-        pathSx = sx  // card top-left works fine — plenty of horizontal clearance
-
-        loopX = ex - 80
-        loopY = ey - photoR * 1.2
-
-        cp1x = pathSx + 20;  cp1y = sy - 100
-        cp2x = loopX + 60;   cp2y = loopY + 50
-        cp3x = loopX - 110;  cp3y = loopY - 25
-        cp4x = ex - 55;      cp4y = ey - 10
-      }
-
-      // Apply seeded wobble to all four control points for hand-drawn character
-      cp1x += w(1); cp1y += w(2)
-      cp2x += w(3); cp2y += w(4)
-      cp3x += w(5); cp3y += w(6)
-      cp4x += w(7); cp4y += w(8)
-
-      // Arrowhead direction = tangent at end of final segment = (end − cp4) normalised
-      const tdx = ex - cp4x, tdy = ey - cp4y
-      const tl  = Math.hypot(tdx, tdy) || 1
-      const tx  = tdx / tl, ty = tdy / tl
-
-      mainD = `M ${pathSx} ${sy} C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${loopX} ${loopY} C ${cp3x} ${cp3y} ${cp4x} ${cp4y} ${ex} ${ey}`
-      h1D   = `M ${ex} ${ey} L ${ex - tx*hs + ty*hs*0.45} ${ey - ty*hs - tx*hs*0.45}`
-      h2D   = `M ${ex} ${ey} L ${ex - tx*hs - ty*hs*0.45} ${ey - ty*hs + tx*hs*0.45}`
-    }
-
-    setPaths({ main: mainD, h1: h1D, h2: h2D })
-  }, [photo, photoRef, cardRef])
-
-  // Compute on mount; recompute (debounced) on resize
-  useEffect(() => {
-    computePaths()
-
-    let debounceTimer: ReturnType<typeof setTimeout> | null = null
-    const onResize = () => {
-      if (debounceTimer) clearTimeout(debounceTimer)
-      debounceTimer = setTimeout(computePaths, 150)
-    }
-    window.addEventListener('resize', onResize)
-    return () => {
-      window.removeEventListener('resize', onResize)
-      if (debounceTimer) clearTimeout(debounceTimer)
-    }
-  }, [computePaths])
-
-  // Animate on first paint; on subsequent resize updates just show the path instantly
-  useEffect(() => {
-    if (!paths) return
-    const main = mainRef.current
-    if (!main) return
-
-    if (hasAnimatedRef.current) {
-      // Resize path update — already drawn, just reposition without replaying animation
-      main.style.transition = 'none'
-      main.style.strokeDasharray = ''
-      main.style.strokeDashoffset = '0'
-      ;[h1Ref, h2Ref].forEach(r => {
-        const el = r.current
-        if (!el) return
-        el.style.transition = 'none'
-        el.style.strokeDasharray = ''
-        el.style.strokeDashoffset = '0'
-      })
-      return
-    }
-    hasAnimatedRef.current = true
-
-    // Hide arrowheads before animation starts
-    ;[h1Ref, h2Ref].forEach(r => {
-      const el = r.current
-      if (!el) return
-      const len = el.getTotalLength()
-      el.style.transition = 'none'
-      el.style.strokeDasharray = `${len}`
-      el.style.strokeDashoffset = `${len}`
-    })
-
-    // Reset main path
-    const len = main.getTotalLength()
-    main.style.transition = 'none'
-    main.style.strokeDasharray = `${len}`
-    main.style.strokeDashoffset = `${len}`
-
-    // Force reflow — prevents browser batching reset + animate into one paint
-    main.getBoundingClientRect()
-
-    // Arrow draws immediately after card appears (slight delay to feel sequential)
-    const t0 = setTimeout(() => {
-      main.style.transition = 'stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1)'
-      main.style.strokeDashoffset = '0'
-    }, 120)
-
-    // Arrowhead snaps in when line finishes
-    const t1 = setTimeout(() => {
-      const h1 = h1Ref.current
-      if (!h1) return
-      h1.getBoundingClientRect()
-      h1.style.transition = 'stroke-dashoffset 0.08s ease-out'
-      h1.style.strokeDashoffset = '0'
-    }, 580)
-
-    const t2 = setTimeout(() => {
-      const h2 = h2Ref.current
-      if (!h2) return
-      h2.getBoundingClientRect()
-      h2.style.transition = 'stroke-dashoffset 0.08s ease-out'
-      h2.style.strokeDashoffset = '0'
-    }, 640)
-
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2) }
-  }, [paths])
-
-  if (!paths) return null
-
-  const base = { stroke: color, strokeWidth: 2.5, strokeLinecap: 'round' as const, fill: 'none' }
-
-  return (
-    <svg
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 49, width: '100vw', height: '100vh' }}
-    >
-      <path ref={mainRef} d={paths.main} {...base} />
-      <path ref={h1Ref}   d={paths.h1}   {...base} />
-      <path ref={h2Ref}   d={paths.h2}   {...base} />
-    </svg>
-  )
-}
-
-function PhotoCard({
-  photo, isMobile, cardRef,
-  onMouseEnter, onMouseLeave, onClose,
-}: {
-  photo: PhotoKey; isMobile: boolean
-  cardRef: RefObject<HTMLDivElement | null>
-  onMouseEnter: () => void; onMouseLeave: () => void; onClose: () => void
-}) {
-  const info  = PHOTO_INFO[photo]
-  const hlRef = useRef<HTMLSpanElement>(null)
-
-  // Highlighter swipe on the [n] label — plays immediately, arrow draws 350ms later
-  useEffect(() => {
-    const hl = hlRef.current
-    if (!hl) return
-    hl.style.transition = 'none'
-    hl.style.transform = 'scaleX(0)'
-    hl.getBoundingClientRect()
-    hl.style.transition = 'transform 0.5s cubic-bezier(0.65, 0, 0.35, 1)'
-    hl.style.transform = 'scaleX(1)'
-  }, [])
-
-  const posClass = isMobile
-    ? 'fixed bottom-4 left-4 right-4'
-    : photo === 'left'
-      ? 'fixed top-[55vh] left-6'
-      : photo === 'center'
-        ? 'fixed top-[55vh] left-1/2 -translate-x-1/2'
-        : 'fixed top-[55vh] right-6'
-
-  return (
-    <div
-      ref={cardRef}
-      className={`${posClass} z-50 md:w-80 bg-background border rounded-2xl shadow-2xl p-5`}
-      style={{ animation: 'pca 0.25s ease-out forwards' }}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      <style>{`@keyframes pca { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
-
-      <div className="flex items-start justify-between mb-3">
-        <p className="text-[10px] font-mono tracking-widest uppercase leading-none">
-          <span className="relative inline-block">
-            <span
-              ref={hlRef}
-              className="absolute inset-y-0 -inset-x-0.5 rounded-sm"
-              style={{
-                background: `${info.color}38`,
-                transformOrigin: 'left center',
-                transform: 'scaleX(0)',
-                zIndex: 0,
-              }}
-            />
-            <span className="relative z-10">
-              <span style={{ color: info.color }}>[{info.num}]</span>
-              {' '}
-              <span className="text-muted-foreground">{info.title}</span>
-            </span>
-          </span>
-        </p>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors shrink-0 ml-3">
-          <X size={14} />
-        </button>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {info.rows.map((row) => (
-          <div key={row.label} className="flex flex-col gap-0.5">
-            <span className="text-xs font-semibold">{row.label}</span>
-            <span className="text-xs text-muted-foreground leading-relaxed">{row.text}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-const FAVE_FILMS = [
-  { title: 'The Departed', note: 'Scorsese at his absolute peak' },
-  { title: 'King of Comedy', note: 'The most underrated Scorsese film' },
-  { title: 'The Town', note: 'Affleck directed and acted film works every time' },
+const SKILLS = [
+  'Python', 'Go', 'TypeScript', 'React', 'FastAPI', 'PostgreSQL', 'Docker',
+  'Google Cloud', 'AWS', 'TensorFlow', 'Apache Spark', 'Kafka', 'Airflow',
+  'Redis', 'MongoDB', 'OpenShift', 'Git', 'Linux', 'Temporal', 'Pandas',
+  'NumPy', 'JWT',
 ]
 
+interface ExpItem {
+  id: string; company: string; role: string
+  period: string; location: string; description: string; tech: string
+}
+
+const EXPERIENCE: ExpItem[] = [
+  {
+    id: 'rbc', company: 'RBC Borealis',
+    role: 'Site Reliability Engineering Intern (Agentic Observability)',
+    period: 'Jan 2026 – Present', location: 'Toronto, CAN',
+    description: 'Building on-premise cloud infrastructure (Lumina Data Platform). Designed and developed an API router connecting multiple microservice endpoints with JWT authentication, achieving sub-1ms Auth Check response times and eliminating a latency bottleneck.',
+    tech: 'Python · Go · FastAPI · Temporal · RedHat OpenShift · DBeaver · Postman',
+  },
+  {
+    id: 'homewise', company: 'Homewise.AI (ex-google, meta)',
+    role: 'Software Engineering, Backend',
+    period: 'Jun 2025 – Jan 2026', location: 'San Francisco, US',
+    description: 'Launched a conversational agentic home-search tool powering end-to-end property discovery using Gemini Flash. Designed agentic workflows with custom SequentialAgent and ParallelAgent pipelines via Google ADK, integrating MCP servers and Vertex RAG Engine. Built and ran Eval Sets to benchmark LLM response quality.',
+    tech: 'Python · Google ADK · GCP · Vertex RAG Engine · PostgreSQL · Docker',
+  },
+  {
+    id: 'exo', company: 'McMaster Exoskeleton',
+    role: 'Software Engineering, ML & AI',
+    period: 'Nov 2024 – Dec 2025', location: 'Hamilton, CAN',
+    description: 'Competed at ACE 2025 (University of Michigan). Built a Python LSTM deep neural network classifying movement types from IMU sensors, productionized via FastAPI. Engineered an ETL data pipeline to process 10+ hours of raw sensor data through AWS S3.',
+    tech: 'Python · TensorFlow · Pandas · NumPy · Apache Spark · AWS',
+  },
+  {
+    id: 'scotiabank', company: 'Scotiabank',
+    role: 'Software Engineering, Data',
+    period: 'Apr 2024 – Sep 2024', location: 'Toronto, CAN',
+    description: 'Part of the Velocity program. Shipped an ELT data pipeline migrating 4TB+ of legacy IBM DB2 data to GCP BigQuery. Optimized SQL queries through unclustered-indexing and broke large tables into dependency-maintained sub-tables.',
+    tech: 'Python · Kafka · Google Cloud Platform · Airflow',
+  },
+  {
+    id: 'research', company: 'McMaster University',
+    role: 'Research Engineering, Super Image Resolution',
+    period: '1 month · 2024', location: 'Hamilton, CAN',
+    description: 'Research engineering position focused on super image resolution. Applied deep learning techniques to upscale and enhance low-resolution images using convolutional neural network architectures on real-world datasets.',
+    tech: 'Python · PyTorch · Computer Vision · NumPy',
+  },
+]
+
+interface ProjItem {
+  id: string; title: string; year: string; status: string
+  description: string; tech: string; github: string; link: string | null
+}
+
+const PROJECTS: ProjItem[] = [
+  {
+    id: 'f1', title: 'Formula-1 Bloomberg Terminal', year: '2025', status: 'WIP',
+    description: 'A centralized data platform for F1 enthusiasts — data dense and LLM enabled to provide critical insights, dashboard features, and custom analytics graphs.',
+    tech: 'Python · PostgreSQL · MongoDB',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+  {
+    id: 'http', title: 'Custom HTTP Framework', year: '2025', status: 'WIP',
+    description: 'Building an HTTP framework from scratch on top of a raw TCP server — no frameworks, no abstractions. Understanding the full request/response lifecycle at the protocol level.',
+    tech: 'Go · TCP · HTTP',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+  {
+    id: 'drone', title: 'Autonomous Rescue Drone', year: '2023', status: 'Done',
+    description: 'Autonomous drone navigation system — implements an exploration command center that scouts an island map, locates points of interest, and returns mission data for a rescue simulation.',
+    tech: 'Java',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+  {
+    id: 'portfolio', title: 'Portfolio Website', year: '2025', status: 'Live',
+    description: 'Personal portfolio — minimal, fast, and handcrafted with React 19, TypeScript, and Tailwind CSS v4.',
+    tech: 'TypeScript · React · Vite · Tailwind',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+]
+
+// Three hand-drawn annotations that fan out of the photo on hover.
+// `angle` = where the arrow leaves the photo (deg, 0 = right, +down, -up).
+// `dy`    = the tooltip's vertical offset from the photo centre.
+const ANNOTATIONS = [
+  {
+    num: '01', color: '#e8483f', subtitle: 'the tie obsession',
+    angle: 8, dy: -40,
+    lines: [
+      "Favourite tie — E. Marinella, Archivio 1942",
+      "Favourite song — The Universal, Blur",
+    ],
+  },
+  {
+    num: '02', color: '#2563eb', subtitle: 'europe trip',
+    angle: -48, dy: -180,
+    lines: [
+      "London → Geneva → Interlaken → Munich",
+      "→ Prague → Berlin → Dublin",
+    ],
+  },
+  {
+    num: '03', color: '#16a34a', subtitle: 'off the clock',
+    angle: 48, dy: 90,
+    lines: [
+      "Latte art on a Breville Barista Express",
+      "Racquet sports & Scorsese films",
+    ],
+  },
+] as const
+
+type Arrow = {
+  path: string
+  tx: number; ty: number
+  color: string
+  num: string; subtitle: string; lines: readonly string[]
+}
+
+// One continuous cubic-bézier annotation line from (sx,sy) on the photo edge
+// to (ex,ey) at the label: short leave-stroke → one open loop → wavy run.
+// All control points explicit & relative, so each is easy to fine-tune.
+function buildArrow(sx: number, sy: number, ex: number, ey: number): string {
+  const k   = 0.5523        // kappa — round loop
+  const r   = 18            // loop radius
+  const lx  = sx + 56       // x where the loop sits on the baseline
+  const ly  = sy            // baseline height where the loop begins
+  const kr  = k * r
+  const ox  = 16            // horizontal gap between loop start & end (open loop)
+  const oy  = 6             // vertical gap — keeps it from closing exactly
+  const bx  = lx + ox       // loop exit / where the wavy run begins
+  const by  = ly + oy
+  const rx  = ex - bx       // horizontal length of the wavy run
+  const ry  = ey - by       // vertical drop across the wavy run
+  const amp = 8             // wave amplitude — shallow & consistent
+
+  return `M ${sx} ${sy}
+    C ${sx + 18} ${sy} ${lx - 18} ${ly} ${lx} ${ly}
+    C ${lx + kr} ${ly} ${lx + r} ${ly - r + kr} ${lx + r} ${ly - r}
+    C ${lx + r} ${ly - r - kr} ${lx + kr} ${ly - 2 * r} ${lx} ${ly - 2 * r}
+    C ${lx - kr} ${ly - 2 * r} ${lx - r} ${ly - r - kr} ${lx - r} ${ly - r}
+    C ${lx - r} ${ly - r + kr} ${lx - kr + ox} ${by} ${bx} ${by}
+    C ${bx + rx * 0.12} ${by + ry * 0.12 - amp} ${bx + rx * 0.24} ${by + ry * 0.24 - amp} ${bx + rx * 0.34} ${by + ry * 0.34}
+    C ${bx + rx * 0.44} ${by + ry * 0.44 + amp} ${bx + rx * 0.56} ${by + ry * 0.56 + amp} ${bx + rx * 0.66} ${by + ry * 0.66}
+    C ${bx + rx * 0.77} ${by + ry * 0.77 - amp} ${bx + rx * 0.90} ${by + ry * 0.90 - amp} ${ex} ${ey}`
+}
+
 export default function Home() {
-  const isMobile = useIsMobile()
-  const [activePhoto, setActivePhoto] = useState<PhotoKey | null>(null)
-  const [animKey, setAnimKey] = useState(0)
-  const [showFilms, setShowFilms] = useState(false)
-  const [showEspresso, setShowEspresso] = useState(false)
-  const leaveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const leftImgRef   = useRef<HTMLButtonElement>(null)
-  const centerImgRef = useRef<HTMLButtonElement>(null)
-  const rightImgRef  = useRef<HTMLButtonElement>(null)
-  const cardRef      = useRef<HTMLDivElement>(null)
+  const [active,     setActive]     = useState('about')
+  const [expPanel,   setExpPanel]   = useState<string>(EXPERIENCE[0].id)
+  const [projPanel,  setProjPanel]  = useState<string>(PROJECTS[0].id)
+  const [arrows,     setArrows]     = useState<Arrow[] | null>(null)
 
-  const clearTimer = () => { if (leaveTimer.current) clearTimeout(leaveTimer.current) }
+  const sparkleRef       = useRef<HTMLDivElement>(null)
+  const expWrapRef       = useRef<HTMLDivElement>(null)
+  const projWrapRef      = useRef<HTMLDivElement>(null)
+  const suitRef          = useRef<HTMLDivElement>(null)
+  const aboutExpandedRef = useRef<HTMLDivElement>(null)
 
-  const handleEnter = useCallback((photo: PhotoKey) => {
-    clearTimer()
-    setActivePhoto(prev => {
-      if (prev !== photo) setAnimKey(k => k + 1)
-      return photo
+  useEffect(() => {
+    const observers = NAV_SECTIONS.map(id => {
+      const el = document.getElementById(id)
+      if (!el) return null
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActive(id) },
+        { rootMargin: '-40% 0px -40% 0px' },
+      )
+      obs.observe(el)
+      return obs
     })
+    return () => observers.forEach(o => o?.disconnect())
   }, [])
 
-  const handleLeave = useCallback(() => {
-    leaveTimer.current = setTimeout(() => setActivePhoto(null), 120)
-  }, [])
-
-  const handleCardEnter = useCallback(() => clearTimer(), [])
-
-  const handleMobileClick = (photo: PhotoKey) => {
-    if (activePhoto === photo) {
-      setActivePhoto(null)
-    } else {
-      setActivePhoto(photo)
-      setAnimKey(k => k + 1)
+  useEffect(() => {
+    const onScroll = () => {
+      const ew = expWrapRef.current
+      if (ew) {
+        const { top, height } = ew.getBoundingClientRect()
+        const range = height - window.innerHeight
+        if (top <= 0 && -top <= range) {
+          const idx = Math.min(Math.floor((-top / range) * EXPERIENCE.length), EXPERIENCE.length - 1)
+          setExpPanel(EXPERIENCE[idx].id)
+        }
+      }
+      const pw = projWrapRef.current
+      if (pw) {
+        const { top, height } = pw.getBoundingClientRect()
+        const range = height - window.innerHeight
+        if (top <= 0 && -top <= range) {
+          const idx = Math.min(Math.floor((-top / range) * PROJECTS.length), PROJECTS.length - 1)
+          setProjPanel(PROJECTS[idx].id)
+        }
+      }
     }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const container = sparkleRef.current
+    if (!container) return
+    const onClick = (e: MouseEvent) => {
+      for (let i = 0; i < 5; i++) {
+        const el = document.createElement('div')
+        el.className = 'block'
+        el.style.left = `${e.clientX + (Math.random() - 0.5) * 24}px`
+        el.style.top  = `${e.clientY + (Math.random() - 0.5) * 24}px`
+        el.style.backgroundColor = Math.random() > 0.5 ? '#000' : '#24adbc'
+        container.appendChild(el)
+        setTimeout(() => el.remove(), 600)
+      }
+    }
+    window.addEventListener('click', onClick)
+    return () => window.removeEventListener('click', onClick)
+  }, [])
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' })
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        window.scrollBy({ top: -window.innerHeight * 0.8, behavior: 'smooth' })
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+  // Build the three hand-drawn annotation arrows fanning out of the photo.
+  const enterPhoto = () => {
+    const ref = suitRef.current
+    const container = aboutExpandedRef.current
+    if (!ref || !container) return
+
+    const photoRect = ref.getBoundingClientRect()
+    const contRect  = container.getBoundingClientRect()
+
+    // Photo geometry, relative to the expanded-about container.
+    const cx  = photoRect.left - contRect.left + photoRect.width / 2
+    const cy  = photoRect.top  - contRect.top  + photoRect.height / 2
+    const rad = photoRect.width / 2
+
+    // All tooltips share a right-hand column; each gets its own height.
+    const TOOLTIP_W = 200
+    const tx = contRect.width - TOOLTIP_W - 40
+
+    const built: Arrow[] = ANNOTATIONS.map(a => {
+      const ang = (a.angle * Math.PI) / 180
+      const sx  = cx + rad * Math.cos(ang)   // start: on the photo's edge
+      const sy  = cy + rad * Math.sin(ang)
+      const ty  = Math.max(10, Math.min(contRect.height - 90, cy + a.dy))
+      const ex  = tx - 12                    // end: just left of the label
+      const ey  = ty + 9
+      return {
+        path: buildArrow(sx, sy, ex, ey),
+        tx, ty, color: a.color,
+        num: a.num, subtitle: a.subtitle, lines: a.lines,
+      }
+    })
+
+    setArrows(built)
   }
 
-  useEffect(() => () => clearTimer(), [])
+  const leavePhoto = () => setArrows(null)
 
-  useEffect(() => {
-    if (!showFilms) return
-    const t = setTimeout(() => setShowFilms(false), 5000)
-    return () => clearTimeout(t)
-  }, [showFilms])
-
-  useEffect(() => {
-    if (!showEspresso) return
-    const t = setTimeout(() => setShowEspresso(false), 5000)
-    return () => clearTimeout(t)
-  }, [showEspresso])
+  const activeExp  = EXPERIENCE.find(e => e.id === expPanel)!
+  const activeProj = PROJECTS.find(p => p.id === projPanel)!
 
   return (
-    <div className="min-h-screen">
+    <>
+      <nav>
+        {NAV_SECTIONS.map(s => (
+          <span key={s} className={active === s ? 'nav-active' : ''} onClick={() => scrollTo(s)}>
+            {s}
+          </span>
+        ))}
+      </nav>
 
-      {/* stacked toasts — top-left */}
-      {(showEspresso || showFilms) && (
-        <div className="fixed top-20 left-4 z-50 flex flex-col gap-3 animate-in slide-in-from-left-4 duration-300">
-          {showEspresso && (
-            <div className="bg-background border rounded-2xl shadow-xl p-4 w-64">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">The Machine</p>
-                <button onClick={() => setShowEspresso(false)} className="text-muted-foreground hover:text-foreground transition-colors">
-                  <X size={12} />
-                </button>
-              </div>
-              <p className="text-sm font-semibold leading-snug">Breville Barista Express</p>
-              <p className="text-xs text-muted-foreground mt-1">BES870XL · Brushed Stainless Steel</p>
-              <p className="text-xs text-muted-foreground italic mt-2">(hope reddit does not disappoint)</p>
+      <div className="sparkle" ref={sparkleRef} />
+
+      {/* ── NAME ────────────────────────────────────────────── */}
+      <section>
+        <div className="name-layout">
+          <div className="name-heading">
+            <h1>Qusay Qadir</h1>
+            <div className="name-location">
+              <span>Toronto, CAN</span>
             </div>
-          )}
-          {showFilms && (
-            <div className="bg-background border rounded-2xl shadow-xl p-4 w-64">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">Fave Films</p>
-                <button onClick={() => setShowFilms(false)} className="text-muted-foreground hover:text-foreground transition-colors">
-                  <X size={12} />
-                </button>
-              </div>
-              <div className="flex flex-col gap-3">
-                {FAVE_FILMS.map((f) => (
-                  <div key={f.title} className="flex flex-col gap-0.5">
-                    <span className="text-sm font-semibold">{f.title}</span>
-                    <span className="text-xs text-muted-foreground">{f.note}</span>
-                  </div>
-                ))}
-              </div>
+          </div>
+
+          <div className="name-meta">
+            <div className="meta-group">
+              <p>McMaster University</p>
+              <p>B.Eng. Software Engineering, Minor in Mathematics</p>
+              <p>2022 – 2027</p>
             </div>
-          )}
+            <div className="meta-group">
+              <p>Site Reliability Engineering Intern (Agentic Observability)</p>
+              <p>@ RBC Borealis</p>
+            </div>
+            <div className="meta-group">
+              <p className="meta-label">currently open to · Fall 2026 &amp; Winter 2027</p>
+              <p>Backend Software Engineering</p>
+              <p>Data Engineering</p>
+              <p>AI / ML Engineering</p>
+            </div>
+          </div>
         </div>
-      )}
+      </section>
 
-      {/* Dim overlay — rendered at root level to avoid FadeIn stacking context */}
-      <div
-        className="fixed inset-0 transition-opacity duration-300"
-        style={{
-          backgroundColor: 'rgba(0,0,0,0.65)',
-          zIndex: 40,
-          opacity: activePhoto ? 1 : 0,
-          pointerEvents: activePhoto && isMobile ? 'auto' : 'none',
-        }}
-        onClick={isMobile ? () => setActivePhoto(null) : undefined}
-      />
+      {/* ── ABOUT ───────────────────────────────────────────── */}
+      <section id="about">
+        <h2>about</h2>
 
-      {/* Floating photo card + arrow overlay — key=animKey remounts both on each hover */}
-      {activePhoto && (
-        <>
-          <PhotoCard
-            key={animKey}
-            photo={activePhoto}
-            isMobile={isMobile}
-            cardRef={cardRef}
-            onMouseEnter={handleCardEnter}
-            onMouseLeave={handleLeave}
-            onClose={() => setActivePhoto(null)}
-          />
-          <ArrowOverlay
-            key={`arrow-${animKey}`}
-            photo={activePhoto}
-            photoRef={activePhoto === 'left' ? leftImgRef : activePhoto === 'center' ? centerImgRef : rightImgRef}
-            cardRef={cardRef}
-            color={PHOTO_INFO[activePhoto].color}
-          />
-        </>
-      )}
+        <p>Hi, I'm Qusay. I like building systems, mostly using Python, Go, and TypeScript.</p>
 
-      <main id="about-me" className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center gap-6 p-8 pt-16">
+        <div className="skills">
+          {SKILLS.map(skill => (
+            <span key={skill} className="skill-pill">{skill}</span>
+          ))}
+        </div>
 
-        <FadeIn className="w-full flex flex-col items-center gap-2">
-          <section className="w-full flex flex-col items-center gap-2">
-            <ThreeCircleImages
-              leftRef={leftImgRef}
-              centerRef={centerImgRef}
-              rightRef={rightImgRef}
-              leftSrc="/images/qusay-suit.png"
-              centerSrc="/images/qusay-geneva.png"
-              rightSrc="/images/qusay-train.png"
-              onLeftClick={isMobile ? () => handleMobileClick('left') : undefined}
-              onCenterClick={isMobile ? () => handleMobileClick('center') : undefined}
-              onRightClick={isMobile ? () => handleMobileClick('right') : undefined}
-              onLeftEnter={!isMobile ? () => handleEnter('left') : undefined}
-              onLeftLeave={!isMobile ? handleLeave : undefined}
-              onCenterEnter={!isMobile ? () => handleEnter('center') : undefined}
-              onCenterLeave={!isMobile ? handleLeave : undefined}
-              onRightEnter={!isMobile ? () => handleEnter('right') : undefined}
-              onRightLeave={!isMobile ? handleLeave : undefined}
-              leftLabel="1"
-              centerLabel="2"
-              rightLabel="3"
-              activeLabel={activePhoto ? PHOTO_INFO[activePhoto].num : null}
-              centerSize={isMobile ? 200 : 360}
-              sideSize={isMobile ? 100 : 200}
-              containerHeight={isMobile ? 260 : 420}
-            />
-          </section>
-        </FadeIn>
+        <div className="more-about-row">
+          <span className="more-arrow">→</span>
+          <label htmlFor="more-info"><span>more about me</span></label>
+        </div>
+        <input id="more-info" type="checkbox" />
 
-        <FadeIn>
-          <p className="text-xs text-muted-foreground font-mono">(each photo has a story)</p>
-        </FadeIn>
+        {/* Expanded div — arrows + tooltip rendered INSIDE here */}
+        <div ref={aboutExpandedRef}>
 
-        <FadeIn className="flex justify-center w-full px-4">
-          <div className="flex flex-col gap-2 items-center">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Qusay Q.</h2>
-            <span className="text-xs font-mono text-muted-foreground">Open to work · Fall 2026 &amp; Winter 2027</span>
-          </div>
-        </FadeIn>
-
-        <FadeIn className="flex justify-center w-full px-4">
-          <div className="w-[100%] max-w-4xl h-max grid gap-4 scroll-mt-24">
-            <p className="whitespace-normal break-words leading-relaxed">
-              Hello, I'm Qusay, based in Toronto, Canada, I am currently a Software Engineering Intern @ RBC Borealis working on building a scalable data platform for internal consumers.
-              I am a Software Engineering student (minor in math) @ McMaster University with a keen interest in system design, databases, networks (specifically GPU to GPU comm) and Agentic AI.
-              Programming for me is a means to build solutions to problems in these domains and I am eager to continue to learn and <strong>build things I can take ownership for!</strong>
-              <br/>
-              <br/>
-              When I am not building, I play all kinds of racquet sports, be an expressive{" "}
-              <span
-                onClick={() => setShowFilms(true)}
-                className="underline underline-offset-2 cursor-pointer"
-              >
-                cinephile
-              </span>
-              , and lose a nights sleep making latte art with my new{" "}
-              <span
-                onClick={() => setShowEspresso(true)}
-                className="underline underline-offset-2 cursor-pointer"
-              >
-                espresso machine
-              </span>
-              .
-              <br/>
-              <br/>
-              Seeking Backend Software Engineering, Data Engineering, or AI dev opportunities for <strong>Fall 2026</strong> and <strong>Winter 2027</strong> -- reach out!
-            </p>
-          </div>
-        </FadeIn>
-
-        <FadeIn className="flex justify-center w-full px-4">
-          <div className="w-[100%] max-w-4xl h-max grid gap-1 scroll-mt-24">
-            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">What I'm up to</p>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">Now</h2>
-            <p className="whitespace-normal break-words leading-relaxed">
-              Outside of work, I'm training for a badminton tournament, building a custom HTTP framework from a raw TCP server, upgrading this website, and studying for my AWS certification exam!
-              Applying to jobs, listening to new music, doing interviews all the while trying to make the most of my last year of undergrad.
-            </p>
-          </div>
-        </FadeIn>
-
-        <FadeIn className="flex justify-center w-full px-4">
-          <div className="w-[100%] max-w-4xl h-max grid gap-4">
-            <p className="text-sm text-muted-foreground font-mono tracking-widest uppercase">Music I'm listening to</p>
-            <MusicSection />
-          </div>
-        </FadeIn>
-
-        <FadeIn className="flex justify-center w-full px-4">
-          <div className="w-[100%] max-w-4xl flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground font-mono tracking-widest uppercase">Experience</p>
-              <Link to="/experience" className="text-xs text-muted-foreground hover:text-foreground transition-colors font-mono tracking-wide">
-                view all →
-              </Link>
-            </div>
-            {[
-              { role: 'Software Engineering, Backend', company: 'RBC Borealis', date: 'Jan 2026 – Present' },
-              { role: 'Software Engineering, Backend', company: 'Stealth AI Startup (Ex-Meta, Google, Databricks)', date: 'Jun 2025 – Jan 2026' },
-              { role: 'Software Engineering, ML & AI', company: 'McMaster Exoskeleton', date: 'Nov 2024 – Dec 2025' },
-              { role: 'Software Engineering, Data', company: 'Scotiabank', date: 'Apr 2024 – Sep 2024' },
-            ].map((item) => (
-              <Link
-                key={item.company}
-                to="/experience"
-                className="group flex items-center justify-between py-3 border-b last:border-b-0 hover:bg-muted/40 px-2 -mx-2 rounded transition-colors duration-150"
-              >
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-sm font-medium">{item.company}</span>
-                  <span className="text-xs text-muted-foreground">{item.role}</span>
+          {/* Arrows + tooltips live inside this div, positioned absolutely */}
+          {arrows && (
+            <>
+              <svg className="about-arrow-svg">
+                <defs>
+                  {/* One small triangular arrowhead per arrow (colour-matched).
+                      auto-rotates to the path so it always points at the label. */}
+                  {arrows.map((a, i) => (
+                    <marker
+                      key={i}
+                      id={`about-arrowhead-${i}`}
+                      viewBox="0 0 10 10"
+                      refX="8" refY="5"
+                      markerWidth="7" markerHeight="7"
+                      orient="auto-start-reverse"
+                    >
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill={a.color} />
+                    </marker>
+                  ))}
+                </defs>
+                {arrows.map((a, i) => (
+                  <path
+                    key={i}
+                    d={a.path}
+                    stroke={a.color} strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round" strokeLinejoin="round"
+                    markerEnd={`url(#about-arrowhead-${i})`}
+                  />
+                ))}
+              </svg>
+              {arrows.map((a, i) => (
+                <div
+                  key={i}
+                  className="about-tooltip"
+                  style={{ left: a.tx, top: a.ty }}
+                >
+                  <span
+                    className="tooltip-label"
+                    style={{ backgroundColor: `${a.color}28` }}
+                  >
+                    [{a.num}] {a.subtitle}
+                  </span>
+                  {a.lines.map((line, j) => <p key={j}>{line}</p>)}
                 </div>
-                <span className="text-xs text-muted-foreground font-mono shrink-0 ml-4">{item.date}</span>
-              </Link>
+              ))}
+            </>
+          )}
+
+          <p>
+            After studying Software Engineering (minor in Mathematics) at McMaster University,
+            I interned at Scotiabank as a data engineer, joined the McMaster Exoskeleton team
+            building ML systems for a wearable robot, then worked as a backend engineer at
+            Homewise.AI — founded by ex-Meta, Google, and Databricks engineers — and am
+            currently interning at RBC Borealis in site reliability and agentic observability.
+          </p>
+          <p>
+            My interests sit at the intersection of system design, databases, GPU-to-GPU
+            networking, and Agentic AI. I like understanding how things work at the layer below
+            the abstraction.
+          </p>
+          <p>
+            When I'm not building: racquet sports, Scorsese films, and latte art with my
+            Breville Barista Express.
+          </p>
+
+          {/* Single photo */}
+          <div className="photo-row">
+            <div ref={suitRef} className="photo-circle-wrap"
+              onMouseEnter={() => enterPhoto()}
+              onMouseLeave={leavePhoto}>
+              <img src="/images/qusay-suit.png" alt="Qusay" className="photo-circle" />
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── EXPERIENCE ──────────────────────────────────────── */}
+      <div id="experience" ref={expWrapRef}
+        style={{ minHeight: `${EXPERIENCE.length * 60 + 100}dvh` }}>
+        <section className="scroll-section">
+          <h2>experience</h2>
+          <div className="item-list">
+            {EXPERIENCE.map(e => (
+              <div key={e.id}
+                className={`item${expPanel === e.id ? ' selected' : ''}`}
+                onClick={() => setExpPanel(e.id)}>
+                {e.company}
+                <span className="item-sub">{e.role} &middot; {e.period}</span>
+              </div>
             ))}
           </div>
-        </FadeIn>
+          <div className="exp-detail">
+            <div className="exp-detail-text" key={expPanel}>
+              <p><strong>{activeExp.company}</strong></p>
+              <p className="exp-role">{activeExp.role}</p>
+              <p className="exp-period">{activeExp.period} &middot; {activeExp.location}</p>
+              <p className="exp-desc">{activeExp.description}</p>
+              <p className="exp-tech">{activeExp.tech}</p>
+            </div>
+            <div className="exp-detail-spacer" />
+          </div>
+        </section>
+      </div>
 
-      </main>
-      <Footer />
-    </div>
+      {/* ── PROJECTS ────────────────────────────────────────── */}
+      <div id="projects" ref={projWrapRef}
+        style={{ minHeight: `${PROJECTS.length * 60 + 100}dvh` }}>
+        <section className="scroll-section">
+          <h2>projects</h2>
+          <div className="item-list">
+            {PROJECTS.map(p => (
+              <div key={p.id}
+                className={`item${projPanel === p.id ? ' selected' : ''}`}
+                onClick={() => setProjPanel(p.id)}>
+                {p.title}
+                <span className="item-sub">{p.year} &middot; {p.status}</span>
+              </div>
+            ))}
+          </div>
+          <div className="proj-detail">
+            <div className="proj-placeholder">coming soon</div>
+            <div className="proj-text" key={projPanel}>
+              <p>{activeProj.description}</p>
+              <p className="proj-tech">{activeProj.tech}</p>
+              <div className="proj-links">
+                <a href={activeProj.github} target="_blank" rel="noopener noreferrer">github</a>
+                {activeProj.link && (
+                  <a href={activeProj.link} target="_blank" rel="noopener noreferrer">project link</a>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* ── RESUME ──────────────────────────────────────────── */}
+      <section id="resume">
+        <h2>resume</h2>
+        <a href={resumePdf} target="_blank" rel="noopener noreferrer">download cv</a>
+      </section>
+
+      {/* ── CONTACT ─────────────────────────────────────────── */}
+      <section id="contact">
+        <h2>contact</h2>
+        <a href="mailto:qadirq@mcmaster.ca">qadirq@mcmaster.ca</a>
+        <a href="https://www.linkedin.com/in/qusay-qadir/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://github.com/qusayqadir" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.instagram.com/qusay.qadir/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </section>
+    </>
   )
 }
