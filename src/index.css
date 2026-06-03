@@ -697,3 +697,92 @@ small {
 section small {
   display: none;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile — phones (≤ 767px)
+   Drops the desktop scroll-jacking (handled in Home.tsx) and
+   reflows every two-column layout into a single column.
+───────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  /* never let a wide child force horizontal scrolling */
+  body {
+    overflow-x: clip;
+    /* clearance so the fixed bottom nav never covers content */
+    padding-bottom: 48px;
+  }
+
+  /* Right-side vertical nav → full-width bottom bar */
+  nav {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2px 4px;
+    padding: 8px 6px;
+    background-color: var(--nav-bg);
+    border-top: 1px dotted var(--border-dotted);
+  }
+
+  nav span {
+    margin: 0;
+    text-align: center;
+  }
+
+  /* Name hero stacks */
+  .name-layout {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .name-meta {
+    padding-top: 0;
+  }
+
+  /* Experience detail: drop the right-hand spacer, go full width */
+  .exp-detail-spacer {
+    display: none;
+  }
+
+  .exp-detail-text {
+    min-height: auto;
+  }
+
+  /* Project detail: placeholder on top, text below */
+  .proj-detail {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .proj-placeholder {
+    width: 100%;
+    height: 140px;
+  }
+
+  /* Skills: tighter label column */
+  .skill-row {
+    gap: 14px;
+  }
+
+  .skill-label {
+    min-width: 52px;
+  }
+
+  /* Photos: smaller and centered so they don't overflow */
+  .photo-row {
+    justify-content: center;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .photo-circle {
+    width: 150px;
+    height: 150px;
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { GitHubCalendar } from 'react-github-calendar'
+import { useIsMobile } from '@/hooks/use-mobile'
 import resumePdf from "@/assets/Qusay_Qadir_Backend_Data_SWE_Intern.pdf"
 
 const NAV_SECTIONS = ['about', 'experience', 'projects', 'github', 'resume', 'contact']
@@ -115,6 +116,7 @@ const PROJECTS: ProjItem[] = [
 
 
 export default function Home() {
+  const isMobile = useIsMobile()
   const [active,     setActive]     = useState('about')
   const [expPanel,   setExpPanel]   = useState<string>(EXPERIENCE[0].id)
   const [projPanel,  setProjPanel]  = useState<string>(PROJECTS[0].id)
@@ -140,6 +142,7 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    if (isMobile) return  // no scroll-jacked panels on touch; items are tap-to-select
     const onScroll = () => {
       const ew = expWrapRef.current
       if (ew) {
@@ -162,7 +165,7 @@ export default function Home() {
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [isMobile])
 
 
   useEffect(() => {
@@ -187,6 +190,7 @@ export default function Home() {
   // Everything else scrolls normally. The animation is self-driven so trackpad
   // momentum can't interrupt it.
   useEffect(() => {
+    if (isMobile) return  // wheel-jack is desktop-only; native touch scrolling on phones
     let animating = false
     let rafId = 0
     const root = document.documentElement
@@ -229,7 +233,7 @@ export default function Home() {
       cancelAnimationFrame(rafId)
       root.style.scrollBehavior = prevBehavior
     }
-  }, [])
+  }, [isMobile])
 
   useEffect(() => {
     const detailTexts = document.querySelectorAll('.exp-detail-text')
@@ -355,12 +359,13 @@ export default function Home() {
 
       {/* ── EXPERIENCE ──────────────────────────────────────── */}
       <div id="experience" ref={expWrapRef}
-        style={{ minHeight: `${EXPERIENCE.length * 30 + 100}dvh` }}>
-        <section className="scroll-section">
+        style={{ minHeight: isMobile ? undefined : `${EXPERIENCE.length * 30 + 100}dvh` }}>
+        <section className={isMobile ? '' : 'scroll-section'}>
           <h2>experience</h2>
           <div className="item-list">
             {EXPERIENCE.map(e => (
               <div key={e.id}
+                onClick={isMobile ? () => setExpPanel(e.id) : undefined}
                 className={`item${expPanel === e.id ? ' selected' : ''}`}>
                 {e.company}
                 <span className="item-sub">{e.role} &middot; {e.period}</span>
@@ -382,12 +387,13 @@ export default function Home() {
 
       {/* ── PROJECTS ────────────────────────────────────────── */}
       <div id="projects" ref={projWrapRef}
-        style={{ minHeight: `${PROJECTS.length * 30 + 100}dvh` }}>
-        <section className="scroll-section">
+        style={{ minHeight: isMobile ? undefined : `${PROJECTS.length * 30 + 100}dvh` }}>
+        <section className={isMobile ? '' : 'scroll-section'}>
           <h2>projects</h2>
           <div className="item-list">
             {PROJECTS.map(p => (
               <div key={p.id}
+                onClick={isMobile ? () => setProjPanel(p.id) : undefined}
                 className={`item${projPanel === p.id ? ' selected' : ''}`}>
                 {p.title}
                 <span className="item-sub">{p.year} &middot; {p.status}</span>
