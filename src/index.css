@@ -12,23 +12,56 @@
   margin: 0;
 }
 
-:root {
-  --white:      #f5f5f5;
-  --secondary:  #24adbc;
-  --page-width: 900px;
-  --px:         12px;
+:root.light {
+  --white:       #f5f5f5;
+  --bg-primary:  #f5f5f5;
+  --text-primary: #000;
+  --text-secondary: #666;
+  --text-tertiary: #888;
+  --secondary:   #24adbc;
+  --border-color: #ddd;
+  --border-dotted: #ccc;
+  --hover-bg:    #f0f0f0;
+  --nav-bg:      #f5f5f5;
+  --nav-active-bg: #000;
+  --nav-active-text: #f5f5f5;
+  --card-border: #ddd;
+  --page-width:  900px;
+  --px:          12px;
+  interpolate-size: allow-keywords;
+}
+
+:root.dark {
+  --white:       #1a1a1a;
+  --bg-primary:  #1a1a1a;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #787878;
+  --secondary:   #24adbc;
+  --border-color: #333;
+  --border-dotted: #444;
+  --hover-bg:    #2a2a2a;
+  --nav-bg:      #1a1a1a;
+  --nav-active-bg: #f5f5f5;
+  --nav-active-text: #1a1a1a;
+  --card-border: #333;
+  --page-width:  900px;
+  --px:          12px;
   interpolate-size: allow-keywords;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 40px;
 }
 
 body {
-  background-color: var(--white);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Verdana', sans-serif;
   --font-size: 0.9rem;
   font-size: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a, p, h1, h2, h3 {
@@ -59,7 +92,7 @@ h1 {
   align-items: center;
   gap: 5px;
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 /* ── Right-fixed nav ──────────────────────────────────────── */
@@ -81,13 +114,15 @@ nav span {
   padding: 4px;
   cursor: pointer;
   display: block;
-  background-color: var(--white);
+  background-color: var(--nav-bg);
+  color: var(--text-primary);
   text-align: right;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 nav span.nav-active {
-  background-color: #000;
-  color: var(--white);
+  background-color: var(--nav-active-bg);
+  color: var(--nav-active-text);
 }
 
 /* ── Sections ─────────────────────────────────────────────── */
@@ -126,7 +161,7 @@ h2::before {
   position: absolute;
   margin-top: -10px;
   transition: 0.5s;
-  border-top: 1px dotted black;
+  border-top: 1px dotted var(--border-dotted);
   width: calc(100% - (var(--px) * 2));
 }
 
@@ -165,7 +200,7 @@ h3 + a {
 .name-meta .meta-group:last-child { margin-bottom: 0; }
 
 .meta-label {
-  color: #888;
+  color: var(--text-tertiary);
   font-size: 0.75rem;
   margin-bottom: 2px;
 }
@@ -188,34 +223,31 @@ h3 + a {
   width: calc(100% + var(--px) * 2);
   font-size: var(--font-size);
   line-height: 1.4rem;
-  cursor: pointer;
   background-color: transparent;
+  color: var(--text-primary);
   border-radius: 4px;
-  transition: background-color 0.32s ease, color 0.32s ease, transform 0.18s ease;
-  transform-origin: left center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  user-select: none;
 }
 
 .item-sub {
   display: block;
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-secondary);
   margin-top: 1px;
   transition: color 0.32s ease;
 }
 
-/* 3D pop-out hover (only when not selected) */
-.item:not(.selected):hover {
-  transform: perspective(500px) translateZ(6px) translateX(2px);
-}
 
 .item.selected {
-  background-color: #000;
-  color: var(--white);
+  background-color: var(--nav-active-bg);
+  color: var(--nav-active-text);
   border-radius: 4px;
 }
 
 .item.selected .item-sub {
-  color: rgba(245, 245, 245, 0.65);
+  color: var(--nav-active-text);
+  opacity: 0.65;
 }
 
 @media screen and (min-width: 400px) {
@@ -230,7 +262,7 @@ h3 + a {
   width: 100%;
   margin-top: 32px;
   padding-top: 20px;
-  border-top: 1px dotted #ccc;
+  border-top: 1px dotted var(--border-dotted);
 }
 
 .exp-detail-spacer {
@@ -242,6 +274,7 @@ h3 + a {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-height: var(--exp-detail-height, auto);
 }
 
 .exp-detail-text p {
@@ -255,14 +288,89 @@ h3 + a {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Fade-in animation for expanded "more about me" section */
+@keyframes expand-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes expand-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 .exp-detail-text,
 .proj-text {
   animation: content-fade 0.3s ease forwards;
 }
 
-.exp-role   { color: #444; }
-.exp-period { color: #888; font-size: 0.75rem; }
-.exp-desc   { color: #333; margin-top: 8px !important; line-height: 1.7 !important; }
+input[type='checkbox']:checked + div {
+  animation: expand-fade-in 0.3s ease forwards;
+}
+
+input[type='checkbox']:not(:checked) + div {
+  animation: expand-fade-out 0.3s ease forwards;
+}
+
+/* Paragraph animations for more-about-me section */
+@keyframes paragraph-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes paragraph-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(8px); }
+}
+
+input[type='checkbox']:checked + div > p {
+  animation: paragraph-fade-in 0.4s ease forwards;
+  opacity: 0;
+}
+
+input[type='checkbox']:checked + div > p:nth-of-type(1) {
+  animation-delay: 0.1s;
+}
+
+input[type='checkbox']:checked + div > p:nth-of-type(2) {
+  animation-delay: 0.3s;
+}
+
+input[type='checkbox']:checked + div > p:nth-of-type(3) {
+  animation-delay: 0.5s;
+}
+
+input[type='checkbox']:checked + div > .photo-row {
+  animation: paragraph-fade-in 0.4s ease forwards;
+  opacity: 0;
+  animation-delay: 0.7s;
+}
+
+/* Fade out animations (reverse order - bottom to top) */
+input[type='checkbox']:not(:checked) + div > p {
+  animation: paragraph-fade-out 0.4s ease forwards;
+}
+
+input[type='checkbox']:not(:checked) + div > p:nth-of-type(1) {
+  animation-delay: 0.7s;
+}
+
+input[type='checkbox']:not(:checked) + div > p:nth-of-type(2) {
+  animation-delay: 0.5s;
+}
+
+input[type='checkbox']:not(:checked) + div > p:nth-of-type(3) {
+  animation-delay: 0.3s;
+}
+
+input[type='checkbox']:not(:checked) + div > .photo-row {
+  animation: paragraph-fade-out 0.4s ease forwards;
+  animation-delay: 0.1s;
+}
+
+.exp-role   { color: var(--text-primary); opacity: 0.85; }
+.exp-period { color: var(--text-tertiary); font-size: 0.75rem; }
+.exp-desc   { color: var(--text-primary); margin-top: 8px !important; line-height: 1.7 !important; }
 .exp-tech   { color: var(--secondary); font-size: 0.75rem; margin-top: 4px !important; }
 
 /* ── Project detail — placeholder left, text right ─────── */
@@ -282,8 +390,8 @@ h3 + a {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dotted #ccc;
-  color: #bbb;
+  border: 1px dotted var(--border-dotted);
+  color: var(--text-tertiary);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: lowercase;
@@ -301,7 +409,7 @@ h3 + a {
 .proj-text p {
   margin-bottom: 0;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .proj-text .proj-tech {
@@ -320,6 +428,8 @@ h3 + a {
 .photo-row {
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
   margin-bottom: 20px;
   margin-top: 80px;
 }
@@ -332,8 +442,8 @@ h3 + a {
 }
 
 .photo-circle {
-  width: 320px;
-  height: 320px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   object-fit: cover;
   object-position: top center;
@@ -345,24 +455,14 @@ h3 + a {
   opacity: 0.82;
 }
 
-/* Arrow SVG — absolute within the expanded about div */
+/* Arrow SVG — hidden */
 .about-arrow-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-  z-index: 5;
+  display: none;
 }
 
-/* Tooltip — absolute within the expanded about div */
+/* Tooltip — hidden */
 .about-tooltip {
-  position: absolute;
-  width: 200px;
-  pointer-events: none;
-  z-index: 6;
-  animation: tooltip-in 0.3s ease, tooltip-highlight 1.2s ease-in-out 0.3s;
+  display: none;
 }
 
 @keyframes tooltip-in {
@@ -386,7 +486,7 @@ h3 + a {
 }
 
 .about-tooltip p {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 3px;
   line-height: 1.5;
   font-size: 0.8rem;
@@ -396,32 +496,38 @@ h3 + a {
   .about-arrow-svg, .about-tooltip { display: none; }
 }
 
-/* ── Skills pills ─────────────────────────────────────────── */
+/* ── Skills section ───────────────────────────────────────── */
 
 .skills {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
   margin-bottom: 16px;
 }
 
-.skill-pill {
-  display: inline-block;
-  padding: 4px 11px;
-  border: 1px solid #ddd;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  color: #555;
-  background: transparent;
-  cursor: default;
-  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+.skill-row {
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
 }
 
-.skill-pill:hover {
-  border-color: var(--secondary);
-  color: var(--secondary);
-  transform: translateY(-2px);
+.skill-label {
+  color: var(--text-tertiary);
+  font-size: 0.7rem;
+  min-width: 60px;
+  text-align: right;
+  flex-shrink: 0;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+}
+
+.skill-list {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  flex: 1;
 }
 
 /* ── More-about arrow ─────────────────────────────────────── */
@@ -483,6 +589,12 @@ input[type='checkbox'] + div {
   position: relative;
 }
 
+/* Force the revealed "more about me" text to match the rest of the site */
+input[type='checkbox'] + div,
+input[type='checkbox'] + div p {
+  font-family: 'Verdana', sans-serif;
+}
+
 input[type='checkbox']:checked + div {
   overflow: visible;
 }
@@ -533,7 +645,24 @@ small {
   font-size: 0.7rem;
   text-align: right;
   bottom: 8px;
-  color: #888;
+  color: var(--text-tertiary);
+}
+
+/* ── GitHub section ──────────────────────────────────────── */
+
+.github-container {
+  margin-top: 32px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+/* react-github-calendar footer (legend) + month/day labels */
+.github-container .react-activity-calendar__count,
+.github-container .react-activity-calendar__legend-colors,
+.github-container text {
+  color: var(--text-tertiary);
+  fill: var(--text-tertiary);
+  font-size: 0.7rem;
 }
 
 /* Resume + contact are compact */

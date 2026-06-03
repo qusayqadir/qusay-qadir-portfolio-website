@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
+import { GitHubCalendar } from 'react-github-calendar'
 import resumePdf from "@/assets/Qusay_Qadir_Backend_Data_SWE_Intern.pdf"
 
-const NAV_SECTIONS = ['about', 'experience', 'projects', 'resume', 'contact']
+const NAV_SECTIONS = ['about', 'experience', 'projects', 'github', 'resume', 'contact']
 
-const SKILLS = [
-  'Python', 'Go', 'TypeScript', 'React', 'FastAPI', 'PostgreSQL', 'Docker',
-  'Google Cloud', 'AWS', 'TensorFlow', 'Apache Spark', 'Kafka', 'Airflow',
-  'Redis', 'MongoDB', 'OpenShift', 'Git', 'Linux', 'Temporal', 'Pandas',
-  'NumPy', 'JWT',
-]
+const SKILLS = {
+  languages: ['Python', 'Go', 'TypeScript'],
+  backend: ['FastAPI', 'React', 'Temporal', 'JWT'],
+  'data & ml': ['PostgreSQL', 'MongoDB', 'Redis', 'Apache Spark', 'Kafka', 'Airflow', 'TensorFlow', 'Pandas', 'NumPy'],
+  infra: ['Docker', 'Google Cloud', 'AWS', 'OpenShift', 'Linux', 'Git'],
+}
 
 interface ExpItem {
   id: string; company: string; role: string
@@ -78,6 +79,30 @@ const PROJECTS: ProjItem[] = [
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
+    id: 'mri', title: 'MRI Cognitive Classification', year: '2024', status: 'Done',
+    description: 'Deep learning pipeline that classifies cognitive conditions from MRI brain scans using convolutional neural networks — covering medical image preprocessing, augmentation, and model evaluation.',
+    tech: 'Python · PyTorch · CNN · NumPy',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+  {
+    id: 'snake', title: 'Snake in C', year: '2023', status: 'Done',
+    description: 'The classic Snake game written from scratch in C — real-time keyboard input, collision detection, and terminal rendering with ncurses.',
+    tech: 'C · ncurses',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+  {
+    id: 'p2p', title: 'Peer to Peer Connection System', year: '2024', status: 'Done',
+    description: 'A decentralized peer-to-peer system enabling direct node-to-node communication with no central server — handling peer discovery, connection management, and data transfer over raw sockets.',
+    tech: 'Go · TCP · Sockets',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+  {
+    id: 'spatial', title: '3D Spatial Mapping Embedded System', year: '2023', status: 'Done',
+    description: 'An embedded system that reconstructs its surroundings as a 3D point cloud — sweeping distance sensors on servo-driven actuators and mapping the environment in real time.',
+    tech: 'C · Embedded · Sensors',
+    github: 'https://github.com/qusayqadir', link: null,
+  },
+  {
     id: 'portfolio', title: 'Portfolio Website', year: '2025', status: 'Live',
     description: 'Personal portfolio — minimal, fast, and handcrafted with React 19, TypeScript, and Tailwind CSS v4.',
     tech: 'TypeScript · React · Vite · Tailwind',
@@ -85,76 +110,12 @@ const PROJECTS: ProjItem[] = [
   },
 ]
 
-// Three hand-drawn annotations that fan out of the photo on hover.
-// `angle` = where the arrow leaves the photo (deg, 0 = right, +down, -up).
-// `dy`    = the tooltip's vertical offset from the photo centre.
-const ANNOTATIONS = [
-  {
-    num: '01', color: '#e8483f', subtitle: 'the tie obsession',
-    angle: 8, dy: -40,
-    lines: [
-      "Favourite tie — E. Marinella, Archivio 1942",
-      "Favourite song — The Universal, Blur",
-    ],
-  },
-  {
-    num: '02', color: '#2563eb', subtitle: 'europe trip',
-    angle: -48, dy: -180,
-    lines: [
-      "London → Geneva → Interlaken → Munich",
-      "→ Prague → Berlin → Dublin",
-    ],
-  },
-  {
-    num: '03', color: '#16a34a', subtitle: 'off the clock',
-    angle: 48, dy: 90,
-    lines: [
-      "Latte art on a Breville Barista Express",
-      "Racquet sports & Scorsese films",
-    ],
-  },
-] as const
-
-type Arrow = {
-  path: string
-  tx: number; ty: number
-  color: string
-  num: string; subtitle: string; lines: readonly string[]
-}
-
-// One continuous cubic-bézier annotation line from (sx,sy) on the photo edge
-// to (ex,ey) at the label: short leave-stroke → one open loop → wavy run.
-// All control points explicit & relative, so each is easy to fine-tune.
-function buildArrow(sx: number, sy: number, ex: number, ey: number): string {
-  const k   = 0.5523        // kappa — round loop
-  const r   = 18            // loop radius
-  const lx  = sx + 56       // x where the loop sits on the baseline
-  const ly  = sy            // baseline height where the loop begins
-  const kr  = k * r
-  const ox  = 16            // horizontal gap between loop start & end (open loop)
-  const oy  = 6             // vertical gap — keeps it from closing exactly
-  const bx  = lx + ox       // loop exit / where the wavy run begins
-  const by  = ly + oy
-  const rx  = ex - bx       // horizontal length of the wavy run
-  const ry  = ey - by       // vertical drop across the wavy run
-  const amp = 8             // wave amplitude — shallow & consistent
-
-  return `M ${sx} ${sy}
-    C ${sx + 18} ${sy} ${lx - 18} ${ly} ${lx} ${ly}
-    C ${lx + kr} ${ly} ${lx + r} ${ly - r + kr} ${lx + r} ${ly - r}
-    C ${lx + r} ${ly - r - kr} ${lx + kr} ${ly - 2 * r} ${lx} ${ly - 2 * r}
-    C ${lx - kr} ${ly - 2 * r} ${lx - r} ${ly - r - kr} ${lx - r} ${ly - r}
-    C ${lx - r} ${ly - r + kr} ${lx - kr + ox} ${by} ${bx} ${by}
-    C ${bx + rx * 0.12} ${by + ry * 0.12 - amp} ${bx + rx * 0.24} ${by + ry * 0.24 - amp} ${bx + rx * 0.34} ${by + ry * 0.34}
-    C ${bx + rx * 0.44} ${by + ry * 0.44 + amp} ${bx + rx * 0.56} ${by + ry * 0.56 + amp} ${bx + rx * 0.66} ${by + ry * 0.66}
-    C ${bx + rx * 0.77} ${by + ry * 0.77 - amp} ${bx + rx * 0.90} ${by + ry * 0.90 - amp} ${ex} ${ey}`
-}
+// Removed arrow and annotation functionality - kept facts in the text
 
 export default function Home() {
   const [active,     setActive]     = useState('about')
   const [expPanel,   setExpPanel]   = useState<string>(EXPERIENCE[0].id)
   const [projPanel,  setProjPanel]  = useState<string>(PROJECTS[0].id)
-  const [arrows,     setArrows]     = useState<Arrow[] | null>(null)
 
   const sparkleRef       = useRef<HTMLDivElement>(null)
   const expWrapRef       = useRef<HTMLDivElement>(null)
@@ -168,7 +129,7 @@ export default function Home() {
       if (!el) return null
       const obs = new IntersectionObserver(
         ([entry]) => { if (entry.isIntersecting) setActive(id) },
-        { rootMargin: '-40% 0px -40% 0px' },
+        { rootMargin: '-20% 0px -60% 0px' },
       )
       obs.observe(el)
       return obs
@@ -201,6 +162,7 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+
   useEffect(() => {
     const container = sparkleRef.current
     if (!container) return
@@ -219,59 +181,72 @@ export default function Home() {
     return () => window.removeEventListener('click', onClick)
   }, [])
 
+  // Scrolling down on the home section animates a jump to the about section.
+  // Everything else scrolls normally. The animation is self-driven so trackpad
+  // momentum can't interrupt it.
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown') {
+    let animating = false
+    let rafId = 0
+    const root = document.documentElement
+    const prevBehavior = root.style.scrollBehavior
+    root.style.scrollBehavior = 'auto'
+
+    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+
+    const animateTo = (targetY: number) => {
+      cancelAnimationFrame(rafId)
+      animating = true
+      const startY = window.scrollY
+      const dist = targetY - startY
+      const dur = 600
+      const t0 = performance.now()
+      const step = (t: number) => {
+        const p = Math.min((t - t0) / dur, 1)
+        window.scrollTo(0, startY + dist * ease(p))
+        if (p < 1) rafId = requestAnimationFrame(step)
+        else animating = false
+      }
+      rafId = requestAnimationFrame(step)
+    }
+
+    const onWheel = (e: WheelEvent) => {
+      if (animating) { e.preventDefault(); return }  // don't let momentum interrupt the jump
+      const about = document.getElementById('about')
+      if (!about) return
+      const rect = about.getBoundingClientRect()
+      // only while on the home section (about still well below the fold) and scrolling down
+      if (e.deltaY > 0 && rect.top > window.innerHeight * 0.5) {
         e.preventDefault()
-        window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' })
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        window.scrollBy({ top: -window.innerHeight * 0.8, behavior: 'smooth' })
+        animateTo(Math.max(0, rect.top + window.scrollY - 40))
       }
     }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
+
+    window.addEventListener('wheel', onWheel, { passive: false })
+    return () => {
+      window.removeEventListener('wheel', onWheel)
+      cancelAnimationFrame(rafId)
+      root.style.scrollBehavior = prevBehavior
+    }
+  }, [])
+
+  useEffect(() => {
+    const detailTexts = document.querySelectorAll('.exp-detail-text')
+    if (detailTexts.length === 0) return
+
+    let maxHeight = 0
+    detailTexts.forEach(el => {
+      const height = (el as HTMLElement).scrollHeight
+      if (height > maxHeight) maxHeight = height
+    })
+
+    const root = document.documentElement
+    root.style.setProperty('--exp-detail-height', `${maxHeight}px`)
   }, [])
 
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
-  // Build the three hand-drawn annotation arrows fanning out of the photo.
-  const enterPhoto = () => {
-    const ref = suitRef.current
-    const container = aboutExpandedRef.current
-    if (!ref || !container) return
-
-    const photoRect = ref.getBoundingClientRect()
-    const contRect  = container.getBoundingClientRect()
-
-    // Photo geometry, relative to the expanded-about container.
-    const cx  = photoRect.left - contRect.left + photoRect.width / 2
-    const cy  = photoRect.top  - contRect.top  + photoRect.height / 2
-    const rad = photoRect.width / 2
-
-    // All tooltips share a right-hand column; each gets its own height.
-    const TOOLTIP_W = 200
-    const tx = contRect.width - TOOLTIP_W - 40
-
-    const built: Arrow[] = ANNOTATIONS.map(a => {
-      const ang = (a.angle * Math.PI) / 180
-      const sx  = cx + rad * Math.cos(ang)   // start: on the photo's edge
-      const sy  = cy + rad * Math.sin(ang)
-      const ty  = Math.max(10, Math.min(contRect.height - 90, cy + a.dy))
-      const ex  = tx - 12                    // end: just left of the label
-      const ey  = ty + 9
-      return {
-        path: buildArrow(sx, sy, ex, ey),
-        tx, ty, color: a.color,
-        num: a.num, subtitle: a.subtitle, lines: a.lines,
-      }
-    })
-
-    setArrows(built)
-  }
-
-  const leavePhoto = () => setArrows(null)
+  // Photo hover events removed - no longer showing arrows
 
   const activeExp  = EXPERIENCE.find(e => e.id === expPanel)!
   const activeProj = PROJECTS.find(p => p.id === projPanel)!
@@ -289,7 +264,7 @@ export default function Home() {
       <div className="sparkle" ref={sparkleRef} />
 
       {/* ── NAME ────────────────────────────────────────────── */}
-      <section>
+      <section id="home">
         <div className="name-layout">
           <div className="name-heading">
             <h1>Qusay Qadir</h1>
@@ -325,8 +300,11 @@ export default function Home() {
         <p>Hi, I'm Qusay. I like building systems, mostly using Python, Go, and TypeScript.</p>
 
         <div className="skills">
-          {SKILLS.map(skill => (
-            <span key={skill} className="skill-pill">{skill}</span>
+          {Object.entries(SKILLS).map(([category, items]) => (
+            <div key={category} className="skill-row">
+              <div className="skill-label">{category}</div>
+              <div className="skill-list">{items.join(' · ')}</div>
+            </div>
           ))}
         </div>
 
@@ -336,81 +314,36 @@ export default function Home() {
         </div>
         <input id="more-info" type="checkbox" />
 
-        {/* Expanded div — arrows + tooltip rendered INSIDE here */}
+        {/* Expanded div */}
         <div ref={aboutExpandedRef}>
 
-          {/* Arrows + tooltips live inside this div, positioned absolutely */}
-          {arrows && (
-            <>
-              <svg className="about-arrow-svg">
-                <defs>
-                  {/* One small triangular arrowhead per arrow (colour-matched).
-                      auto-rotates to the path so it always points at the label. */}
-                  {arrows.map((a, i) => (
-                    <marker
-                      key={i}
-                      id={`about-arrowhead-${i}`}
-                      viewBox="0 0 10 10"
-                      refX="8" refY="5"
-                      markerWidth="7" markerHeight="7"
-                      orient="auto-start-reverse"
-                    >
-                      <path d="M 0 0 L 10 5 L 0 10 z" fill={a.color} />
-                    </marker>
-                  ))}
-                </defs>
-                {arrows.map((a, i) => (
-                  <path
-                    key={i}
-                    d={a.path}
-                    stroke={a.color} strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round" strokeLinejoin="round"
-                    markerEnd={`url(#about-arrowhead-${i})`}
-                  />
-                ))}
-              </svg>
-              {arrows.map((a, i) => (
-                <div
-                  key={i}
-                  className="about-tooltip"
-                  style={{ left: a.tx, top: a.ty }}
-                >
-                  <span
-                    className="tooltip-label"
-                    style={{ backgroundColor: `${a.color}28` }}
-                  >
-                    [{a.num}] {a.subtitle}
-                  </span>
-                  {a.lines.map((line, j) => <p key={j}>{line}</p>)}
-                </div>
-              ))}
-            </>
-          )}
-
-          <p>
+          <p style={{ fontFamily: 'Verdana, Geneva, sans-serif' }}>
             After studying Software Engineering (minor in Mathematics) at McMaster University,
             I interned at Scotiabank as a data engineer, joined the McMaster Exoskeleton team
             building ML systems for a wearable robot, then worked as a backend engineer at
             Homewise.AI — founded by ex-Meta, Google, and Databricks engineers — and am
             currently interning at RBC Borealis in site reliability and agentic observability.
           </p>
-          <p>
+          <p style={{ fontFamily: 'Verdana, Geneva, sans-serif' }}>
             My interests sit at the intersection of system design, databases, GPU-to-GPU
             networking, and Agentic AI. I like understanding how things work at the layer below
             the abstraction.
           </p>
-          <p>
+          <p style={{ fontFamily: 'Verdana, Geneva, sans-serif' }}>
             When I'm not building: racquet sports, Scorsese films, and latte art with my
             Breville Barista Express.
           </p>
 
-          {/* Single photo */}
+          {/* Photos */}
           <div className="photo-row">
-            <div ref={suitRef} className="photo-circle-wrap"
-              onMouseEnter={() => enterPhoto()}
-              onMouseLeave={leavePhoto}>
+            <div ref={suitRef} className="photo-circle-wrap">
               <img src="/images/qusay-suit.png" alt="Qusay" className="photo-circle" />
+            </div>
+            <div className="photo-circle-wrap">
+              <img src="/images/qusay-geneva.png" alt="Qusay in Geneva" className="photo-circle" />
+            </div>
+            <div className="photo-circle-wrap">
+              <img src="/images/qusay-train.png" alt="Qusay on the GO train" className="photo-circle" />
             </div>
           </div>
 
@@ -419,14 +352,13 @@ export default function Home() {
 
       {/* ── EXPERIENCE ──────────────────────────────────────── */}
       <div id="experience" ref={expWrapRef}
-        style={{ minHeight: `${EXPERIENCE.length * 60 + 100}dvh` }}>
+        style={{ minHeight: `${EXPERIENCE.length * 30 + 100}dvh` }}>
         <section className="scroll-section">
           <h2>experience</h2>
           <div className="item-list">
             {EXPERIENCE.map(e => (
               <div key={e.id}
-                className={`item${expPanel === e.id ? ' selected' : ''}`}
-                onClick={() => setExpPanel(e.id)}>
+                className={`item${expPanel === e.id ? ' selected' : ''}`}>
                 {e.company}
                 <span className="item-sub">{e.role} &middot; {e.period}</span>
               </div>
@@ -447,14 +379,13 @@ export default function Home() {
 
       {/* ── PROJECTS ────────────────────────────────────────── */}
       <div id="projects" ref={projWrapRef}
-        style={{ minHeight: `${PROJECTS.length * 60 + 100}dvh` }}>
+        style={{ minHeight: `${PROJECTS.length * 30 + 100}dvh` }}>
         <section className="scroll-section">
           <h2>projects</h2>
           <div className="item-list">
             {PROJECTS.map(p => (
               <div key={p.id}
-                className={`item${projPanel === p.id ? ' selected' : ''}`}
-                onClick={() => setProjPanel(p.id)}>
+                className={`item${projPanel === p.id ? ' selected' : ''}`}>
                 {p.title}
                 <span className="item-sub">{p.year} &middot; {p.status}</span>
               </div>
@@ -475,6 +406,24 @@ export default function Home() {
           </div>
         </section>
       </div>
+
+      {/* ── GITHUB ──────────────────────────────────────────── */}
+      <section id="github">
+        <h2>github</h2>
+        <div className="github-container">
+          <GitHubCalendar
+            username="qusayqadir"
+            colorScheme="light"
+            blockSize={12}
+            blockMargin={3}
+            fontSize={11}
+            theme={{
+              light: ['#e3e3e3', '#a8dde2', '#6cc7d1', '#3fb5c2', '#24adbc'],
+              dark: ['#2a2a2a', '#1a5a63', '#1d7d8a', '#208fa0', '#24adbc'],
+            }}
+          />
+        </div>
+      </section>
 
       {/* ── RESUME ──────────────────────────────────────────── */}
       <section id="resume">
