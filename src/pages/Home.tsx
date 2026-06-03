@@ -7,8 +7,9 @@ const NAV_SECTIONS = ['about', 'experience', 'projects', 'github', 'resume', 'co
 const SKILLS = {
   languages: ['Python', 'Java', 'SQL'],
   backend: ['Django', 'FastAPI', 'FastMCP', 'GraphQL', `Redis`],
-  'data & ml': ['PostgreSQL', 'MongoDB', 'Apache Spark', 'Kafka', `MCP`, `RAG`],
-  infra: ['Docker', 'AWS', 'OpenShift', 'Linux', 'Github'],
+  'data & ml': ['PostgreSQL', 'MongoDB', 'Apache Spark', 'Kafka', `LangChain/LangGraph/LangSmith`, `RAG`, `MCP`],
+  infra: ['AWS', `GCP`, `Docker`, 'OpenShift', 'Linux', 'Github'],
+  tools: [`Claude Code`, `Windsurf`, `Postman`, ],
 }
 
 interface ExpItem {
@@ -19,36 +20,36 @@ interface ExpItem {
 const EXPERIENCE: ExpItem[] = [
   {
     id: 'rbc', company: 'RBC Borealis',
-    role: 'Site Reliability Engineering Intern (Agentic Observability)',
+    role: 'Software Engineer Intern (Agentic Observability)',
     period: 'Jan 2026 – Present', location: 'Toronto, CAN',
-    description: 'Building on-premise cloud infrastructure (Lumina Data Platform). Designed and developed an API router connecting multiple microservice endpoints with JWT authentication, achieving sub-1ms Auth Check response times and eliminating a latency bottleneck.',
+    description: 'Lumina Data Platform: Built evaluation pipelines for RBC Assist user interaction traces. Engineering an API suite for an Email Alert Notification Service. Designed and developed API router connecting multiple microservice endpoints with JWT authentication, eliminating a latency bottleneck.',
     tech: 'Python · Go · FastAPI · Temporal · RedHat OpenShift · DBeaver · Postman',
   },
   {
-    id: 'homewise', company: 'Homewise.AI (ex-google, meta)',
-    role: 'Software Engineering, Backend',
+    id: 'homewise', company: 'Homewise.AI (ex-google, ex-meta)',
+    role: 'Software Engineer, Backend',
     period: 'Jun 2025 – Jan 2026', location: 'San Francisco, US',
-    description: 'Launched a conversational agentic home-search tool powering end-to-end property discovery using Gemini Flash. Designed agentic workflows with custom SequentialAgent and ParallelAgent pipelines via Google ADK, integrating MCP servers and Vertex RAG Engine. Built and ran Eval Sets to benchmark LLM response quality.',
+    description: 'Launched a conversational agentic home-search tool powering end-to-end property discovery using Gemini Flash. Designed agentic workflows with custom SequentialAgent and ParallelAgent pipelines via Google ADK, integrating MCP servers and Vertex RAG Engine. The workflows managed home research based off client research, home due-diligence, financial planning, and calender management (personal and showing). Finally built system Eval Sets to benchmark LLM response quality.',
     tech: 'Python · Google ADK · GCP · Vertex RAG Engine · PostgreSQL · Docker',
   },
   {
     id: 'exo', company: 'McMaster Exoskeleton',
     role: 'Software Engineering, ML & AI',
     period: 'Nov 2024 – Dec 2025', location: 'Hamilton, CAN',
-    description: 'Competed at ACE 2025 (University of Michigan). Built a Python LSTM deep neural network classifying movement types from IMU sensors, productionized via FastAPI. Engineered an ETL data pipeline to process 10+ hours of raw sensor data through AWS S3.',
+    description: 'Competed at ACE 2025 (University of Michigan). Built a Python LSTM deep neural network classifying movement types from IMU sensors, productionized via FastAPI. Engineered an ETL data pipeline to process 10+ hours of raw sensor data through AWS S3. Allowed 15+ team memebers to interact with the S3 object instance via custom CLI tool and provisioned IAM policies.',
     tech: 'Python · TensorFlow · Pandas · NumPy · Apache Spark · AWS',
   },
   {
     id: 'scotiabank', company: 'Scotiabank',
-    role: 'Software Engineering, Data',
+    role: 'Software Engineer, Data',
     period: 'Apr 2024 – Sep 2024', location: 'Toronto, CAN',
-    description: 'Part of the Velocity program. Shipped an ELT data pipeline migrating 4TB+ of legacy IBM DB2 data to GCP BigQuery. Optimized SQL queries through unclustered-indexing and broke large tables into dependency-maintained sub-tables.',
+    description: 'Part of the Velocity program. Shipped an ELT data pipeline migrating 4TB+ of legacy IBM DB2 data to GCP BigQuery and Snowflake. Optimized SQL queries through unclustered-indexing and broke large tables into dependency-maintained sub-tables.',
     tech: 'Python · Kafka · Google Cloud Platform · Airflow',
   },
   {
-    id: 'research', company: 'McMaster University',
-    role: 'Research Engineering, Super Image Resolution',
-    period: '1 month · 2024', location: 'Hamilton, CAN',
+    id: 'research', company: 'Super Image Resolution Lab - McMaster University',
+    role: 'Software Research Engineering',
+    period: ' June 2024', location: 'Hamilton, CAN',
     description: 'Research engineering position focused on super image resolution. Applied deep learning techniques to upscale and enhance low-resolution images using convolutional neural network architectures on real-world datasets.',
     tech: 'Python · PyTorch · Computer Vision · NumPy',
   },
@@ -61,56 +62,57 @@ interface ProjItem {
 
 const PROJECTS: ProjItem[] = [
   {
-    id: 'f1', title: 'Formula-1 Bloomberg Terminal', year: '2025', status: 'WIP',
-    description: 'A centralized data platform for F1 enthusiasts — data dense and LLM enabled to provide critical insights, dashboard features, and custom analytics graphs.',
-    tech: 'Python · PostgreSQL · MongoDB',
+    id: 'f1', title: 'Formula-1 Bloomberg Terminal Engine', year: 'April 2026 - Present', status: 'WIP',
+    description: 'A centralized data platform for F1 enthusiasts, a data dense and LLM enabled web application to provide critical insights, dashboard features, and custom analytics graphs based off natural langauge queries. Experimented with RAG techniques like hybrid search (keyword and vectorbased), re-rank, MCP clients, and built a knowledge corpus. Managed agentic workflows using LangGraph. Provided users with an interactive live race dashboard with sub 5ms latency from real time that would allow them to view different racer telemetry data. Also a historical dashbaord which consisted of designing a batch datapipeline, database scheam design and endpoint delivery.' ,
+    tech: 'Python · PostgreSQL · LangGraph · MongoDB ',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'http', title: 'Custom HTTP Framework', year: '2025', status: 'WIP',
-    description: 'Building an HTTP framework from scratch on top of a raw TCP server — no frameworks, no abstractions. Understanding the full request/response lifecycle at the protocol level.',
-    tech: 'Go · TCP · HTTP',
+    id: 'portfolio', title: 'Portfolio Website', year: 'March 2026 - Present', status: 'Live',
+    description: 'Personal portfolio website to show off experience and projects in React 19, TypeScript, and Tailwind CSS v4.',
+    tech: 'TypeScript · React · Vite · Tailwind',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'drone', title: 'Autonomous Rescue Drone', year: '2023', status: 'Done',
-    description: 'Autonomous drone navigation system — implements an exploration command center that scouts an island map, locates points of interest, and returns mission data for a rescue simulation.',
-    tech: 'Java',
+    id: 'http', title: 'Custom HTTP Framework', year: 'Feb 2026', status: 'WIP',
+    description: 'Building an HTTP framework from scratch on top of a raw TCP server, no frameworks, no abstractions. Understanding the full request/response lifecycle at the protocol level.',
+    tech: 'Python · TCP · HTTP',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'mri', title: 'MRI Cognitive Classification', year: '2024', status: 'Done',
-    description: 'Deep learning pipeline that classifies cognitive conditions from MRI brain scans using convolutional neural networks — covering medical image preprocessing, augmentation, and model evaluation.',
-    tech: 'Python · PyTorch · CNN · NumPy',
-    github: 'https://github.com/qusayqadir', link: null,
-  },
-  {
-    id: 'snake', title: 'Snake in C', year: '2023', status: 'Done',
-    description: 'The classic Snake game written from scratch in C — real-time keyboard input, collision detection, and terminal rendering with ncurses.',
-    tech: 'C · ncurses',
-    github: 'https://github.com/qusayqadir', link: null,
-  },
-  {
-    id: 'p2p', title: 'Peer to Peer Connection System', year: '2024', status: 'Done',
-    description: 'A decentralized peer-to-peer system enabling direct node-to-node communication with no central server — handling peer discovery, connection management, and data transfer over raw sockets.',
+    id: 'p2p', title: 'Peer to Peer Connection System', year: 'Feb 2026', status: 'Done',
+    description: 'A decentralized peer-to-peer system enabling direct node-to-node communication with no central server handling peer discovery, connection management, and data transfer over raw sockets.',
     tech: 'Go · TCP · Sockets',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'spatial', title: '3D Spatial Mapping Embedded System', year: '2023', status: 'Done',
-    description: 'An embedded system that reconstructs its surroundings as a 3D point cloud — sweeping distance sensors on servo-driven actuators and mapping the environment in real time.',
-    tech: 'C · Embedded · Sensors',
+    id: 'mri', title: 'MRI Cognitive Classification', year: 'Oct 2025 - Dec 2025', status: 'Done',
+    description: 'Deep learning pipeline that classifies cognitive conditions from MRI brain scans using convolutional neural networks covering medical image preprocessing, augmentation, and model evaluation.',
+    tech: 'Python · PyTorch · CNN · NumPy',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'portfolio', title: 'Portfolio Website', year: '2025', status: 'Live',
-    description: 'Personal portfolio — minimal, fast, and handcrafted with React 19, TypeScript, and Tailwind CSS v4.',
-    tech: 'TypeScript · React · Vite · Tailwind',
-    github: 'https://github.com/qusayqadir', link: null,
+    id: 'drone', title: 'Autonomous Rescue Drone', year: 'Feb 2025 - Apri 2025', status: 'Done',
+    description: 'Autonomous drone navigation system, implements an exploration command center that scouts an island map, locates points of interest, and returns mission data for a rescue simulation.',
+    tech: 'Java · Software Design Patterns',
+    github: 'https://github.com/qusayqadir/Rescue_Drone_AutoNav', link: null,
   },
+  {
+    id: 'snake', title: 'Snake in C', year: 'Sept 2024', status: 'Done',
+    description: 'The classic Snake game written from scratch in C with real-time keyboard input, collision detection, and terminal rendering with ncurses.',
+    tech: 'C · C++',
+    github: 'https://github.com/qusayqadir/OOP-SnakeGame-C-', link: null,
+  },
+  {
+    id: 'spatial', title: '3D Spatial Mapping Embedded System', year: '2024', status: 'Done',
+    description: 'An embedded system that reconstructs its surroundings as a 3D point cloud sweeping distance sensors on servo-driven actuators and mapping the environment in real time.',
+    tech: 'C · Embedded · Sensors',
+    github: 'https://github.com/qusayqadir', link: null,
+  }
 ]
 
 // Removed arrow and annotation functionality - kept facts in the text
+
 
 export default function Home() {
   const [active,     setActive]     = useState('about')
@@ -275,25 +277,25 @@ export default function Home() {
 
           <div className="name-meta">
             <div className="meta-group">
-            </div>
-            <div className="meta-group">
-              <p>Software Engineering Intern (Agentic Observability)</p>
+              <p>Software Engineer Intern (Agentic Observability)</p>
               <p>@ RBC Borealis</p>
             </div>
             <div className="meta-group">
-              <p className="meta-label">currently open to · Fall 2026 &amp; Winter 2027</p>
-              <p>Backend / Data / Database Software Engineering</p>
-              <p>AI / MLAOps Engineering</p>
+              <p className="meta-label">currently open for Fall 2026 &amp; Winter 2027 internship opportunities in</p>
+              <br></br>
+              <p>Backend / Data / Database Software Engineer</p>
+              <p>AI / MLOps Engineer</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── ABOUT ───────────────────────────────────────────── */}
+      {/* ── ABOUT ─────────────────────────────
+      ──────────────── */}
       <section id="about">
         <h2>about</h2>
 
-        <p>Hi, I'm Qusay. I like building systems, using Python, Database, and Agents!</p>
+        <p>Hi, I'm Qusay. I like building systems, that involve Python, Databases, and Agents!</p>
 
         <div className="skills">
           {Object.entries(SKILLS).map(([category, items]) => (
@@ -314,20 +316,25 @@ export default function Home() {
         <div ref={aboutExpandedRef}>
 
           <p style={{ fontFamily: 'Verdana, Geneva, sans-serif' }}>
-            After studying Software Engineering (minor in Mathematics) at McMaster University,
-            I interned at Scotiabank as a data engineer, joined the McMaster Exoskeleton team
-            building ML systems for a wearable robot, then worked as a backend engineer at
-            Homewise.AI — founded by ex-Meta, Google, and Databricks engineers — and am
-            currently interning at RBC Borealis in site reliability and agentic observability.
+            Currently @ McMaster University studying Software Engineering COOP (minor in math).
           </p>
           <p style={{ fontFamily: 'Verdana, Geneva, sans-serif' }}>
-            My interests sit at the intersection of system design, databases, GPU-to-GPU
-            networking, and Agentic AI. I like understanding how things work at the layer below
-            the abstraction.
+            Most recently was a stealth startup software engineer, Homewise.AI, based in the bay area and found by ex-meta ex-google and ex-databricks engineers, where 
+            I was tasked to build agentic orchestrations that would off load admin work for real estate agents in the 
+            greater seattle area. The goal of these agentic systems was to find homes for the clients of real estate agents based off their preference, home due-diligence, financial planning, and calender management (personal and showings).
+            
+            <br></br>
+            <br></br>
+            Interned @ Scotiabank as a Data Engineer building enterprise migration (to snowflake) data pipelines, building skills in  
+            kafka, spark, and relational databases. 
+
           </p>
           <p style={{ fontFamily: 'Verdana, Geneva, sans-serif' }}>
-            When I'm not building: racquet sports, Scorsese films, and latte art with my
-            Breville Barista Express.
+            My interests lie @ the intersection of fintech, system design, databases, 
+            network latencty. 
+          </p>
+          <p style={{ fontFamily: 'Verdana, Geneva, sans-serif' }}>
+            When I'm not building; ciniphile, athlete, and clinically dependent on caffeine (coffee chat?)
           </p>
 
           {/* Photos */}

@@ -145,6 +145,10 @@ section {
   overflow: hidden;
   position: sticky;
   top: 0;
+  /* Center the content when it fits, but if it overflows (e.g. browser
+     zoom > 100%), fall back to top-alignment so the section header is
+     NEVER clipped off the top. */
+  justify-content: safe center;
 }
 
 section:last-of-type {
@@ -180,7 +184,9 @@ h3 + a {
 .name-layout {
   display: flex;
   gap: 60px;
-  align-items: flex-start;
+  /* align the name and the meta column on the same baseline so
+     "Software Engineering Intern…" sits in line with "Qusay Qadir" */
+  align-items: baseline;
 }
 
 .name-meta {
@@ -333,11 +339,15 @@ input[type='checkbox']:checked + div > p:nth-of-type(1) {
 }
 
 input[type='checkbox']:checked + div > p:nth-of-type(2) {
-  animation-delay: 0.3s;
+  animation-delay: 0.25s;
 }
 
 input[type='checkbox']:checked + div > p:nth-of-type(3) {
-  animation-delay: 0.5s;
+  animation-delay: 0.4s;
+}
+
+input[type='checkbox']:checked + div > p:nth-of-type(4) {
+  animation-delay: 0.55s;
 }
 
 input[type='checkbox']:checked + div > .photo-row {
@@ -351,16 +361,20 @@ input[type='checkbox']:not(:checked) + div > p {
   animation: paragraph-fade-out 0.4s ease forwards;
 }
 
-input[type='checkbox']:not(:checked) + div > p:nth-of-type(1) {
-  animation-delay: 0.7s;
-}
-
-input[type='checkbox']:not(:checked) + div > p:nth-of-type(2) {
-  animation-delay: 0.5s;
+input[type='checkbox']:not(:checked) + div > p:nth-of-type(4) {
+  animation-delay: 0.25s;
 }
 
 input[type='checkbox']:not(:checked) + div > p:nth-of-type(3) {
-  animation-delay: 0.3s;
+  animation-delay: 0.4s;
+}
+
+input[type='checkbox']:not(:checked) + div > p:nth-of-type(2) {
+  animation-delay: 0.55s;
+}
+
+input[type='checkbox']:not(:checked) + div > p:nth-of-type(1) {
+  animation-delay: 0.7s;
 }
 
 input[type='checkbox']:not(:checked) + div > .photo-row {
@@ -436,9 +450,11 @@ input[type='checkbox']:not(:checked) + div > .photo-row {
 
 .photo-circle-wrap {
   position: relative;
-  cursor: pointer;
   display: inline-block;
   flex-shrink: 0;
+  /* circular frame that clips the image so it can gently zoom within on hover */
+  border-radius: 50%;
+  overflow: hidden;
 }
 
 .photo-circle {
@@ -448,11 +464,18 @@ input[type='checkbox']:not(:checked) + div > .photo-row {
   object-fit: cover;
   object-position: top center;
   display: block;
-  transition: opacity 0.2s ease;
+  transition: transform 0.45s ease;
 }
 
+/* Slight interactive cue — the photo gently zooms inside its circle on hover.
+   Not clickable, so no pointer cursor. */
 .photo-circle-wrap:hover .photo-circle {
-  opacity: 0.82;
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-circle { transition: none; }
+  .photo-circle-wrap:hover .photo-circle { transform: none; }
 }
 
 /* Arrow SVG — hidden */
