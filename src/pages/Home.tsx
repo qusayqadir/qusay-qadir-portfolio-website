@@ -5,10 +5,10 @@ import resumePdf from "@/assets/Qusay_Qadir_Backend_Data_SWE_Intern.pdf"
 const NAV_SECTIONS = ['about', 'experience', 'projects', 'github', 'resume', 'contact']
 
 const SKILLS = {
-  languages: ['Python', 'Go', 'TypeScript'],
-  backend: ['FastAPI', 'React', 'Temporal', 'JWT'],
-  'data & ml': ['PostgreSQL', 'MongoDB', 'Redis', 'Apache Spark', 'Kafka', 'Airflow', 'TensorFlow', 'Pandas', 'NumPy'],
-  infra: ['Docker', 'Google Cloud', 'AWS', 'OpenShift', 'Linux', 'Git'],
+  languages: ['Python', 'Java', 'SQL'],
+  backend: ['Django', 'FastAPI', 'FastMCP', 'GraphQL', `Redis`],
+  'data & ml': ['PostgreSQL', 'MongoDB', 'Apache Spark', 'Kafka', `MCP`, `RAG`],
+  infra: ['Docker', 'AWS', 'OpenShift', 'Linux', 'Github'],
 }
 
 interface ExpItem {
@@ -275,19 +275,15 @@ export default function Home() {
 
           <div className="name-meta">
             <div className="meta-group">
-              <p>McMaster University</p>
-              <p>B.Eng. Software Engineering, Minor in Mathematics</p>
-              <p>2022 – 2027</p>
             </div>
             <div className="meta-group">
-              <p>Site Reliability Engineering Intern (Agentic Observability)</p>
+              <p>Software Engineering Intern (Agentic Observability)</p>
               <p>@ RBC Borealis</p>
             </div>
             <div className="meta-group">
               <p className="meta-label">currently open to · Fall 2026 &amp; Winter 2027</p>
-              <p>Backend Software Engineering</p>
-              <p>Data Engineering</p>
-              <p>AI / ML Engineering</p>
+              <p>Backend / Data / Database Software Engineering</p>
+              <p>AI / MLAOps Engineering</p>
             </div>
           </div>
         </div>
@@ -297,7 +293,7 @@ export default function Home() {
       <section id="about">
         <h2>about</h2>
 
-        <p>Hi, I'm Qusay. I like building systems, mostly using Python, Go, and TypeScript.</p>
+        <p>Hi, I'm Qusay. I like building systems, using Python, Database, and Agents!</p>
 
         <div className="skills">
           {Object.entries(SKILLS).map(([category, items]) => (
