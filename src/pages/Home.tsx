@@ -23,14 +23,14 @@ const EXPERIENCE: ExpItem[] = [
     id: 'rbc', company: 'RBC Borealis',
     role: 'Software Engineer Intern (Agentic Observability)',
     period: 'Jan 2026 – Present', location: 'Toronto, CAN',
-    description: 'Lumina Data Platform: Built evaluation pipelines for RBC Assist user interaction traces. Engineering an API suite for an Email Alert Notification Service. Designed and developed API router connecting multiple microservice endpoints with JWT authentication, eliminating a latency bottleneck.',
+    description: 'Lumina Data Platform: Built evaluation pipelines for RBC Assist user interaction traces. Created APIs for RBC Assist prod canary testing, pii traces, and content behaviour safety. Engineering an API suite for an Email Alert Notification Service. Designed and developed API router connecting multiple microservice endpoints with JWT authentication, eliminating a latency bottleneck.',
     tech: 'Python · Go · FastAPI · Temporal · RedHat OpenShift · DBeaver · Postman',
   },
   {
     id: 'homewise', company: 'Homewise.AI (ex-google, ex-meta)',
     role: 'Software Engineer, Backend',
     period: 'Jun 2025 – Jan 2026', location: 'San Francisco, US',
-    description: 'Launched a conversational agentic home-search tool powering end-to-end property discovery using Gemini Flash. Designed agentic workflows with custom SequentialAgent and ParallelAgent pipelines via Google ADK, integrating MCP servers and Vertex RAG Engine. The workflows managed home research based off client research, home due-diligence, financial planning, and calender management (personal and showing). Finally built system Eval Sets to benchmark LLM response quality.',
+    description: 'Launched a conversational agentic home-search tool powering end-to-end property discovery using Gemini Flash. Designed backend agentic workflows with custom SequentialAgent and ParallelAgent pipelines via Google ADK, integrating MCP servers and Vertex RAG Engine. The workflows managed home research based off client research, home due-diligence, financial planning, and calender management (personal and showing). Finally built system Eval Sets to benchmark LLM response quality.',
     tech: 'Python · Google ADK · GCP · Vertex RAG Engine · PostgreSQL · Docker',
   },
   {

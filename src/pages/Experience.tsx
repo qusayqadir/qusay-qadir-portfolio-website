@@ -19,7 +19,7 @@ export default function Experience() {
               description={
                 <>
                   Building on-premise cloud infrastructure ( Lumina Data Platform ).
-                  <br/>
+                  <br></br>
                   Designed and developed an API router to connect multiple microservice endpoints using Python and FastAPI with JSON Web Token authentication and authorization
                   for sub 1ms response time for the Auth Check of the API request, eliminating a latency bottleneck.
                   <br/><br/>
