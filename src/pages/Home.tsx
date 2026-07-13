@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { GitHubCalendar } from 'react-github-calendar'
 import { useIsMobile } from '@/hooks/use-mobile'
-import resumePdf from "@/assets/Qusay_Qadir_Intern_BackendSWE_2026.pdf"
+import resumePdf from "@/assets/Qusay_Qadir_Backend_Engineer_2027Grad.pdf"
 
 const NAV_SECTIONS = ['about', 'experience', 'projects', 'github', 'resume', 'contact']
 
