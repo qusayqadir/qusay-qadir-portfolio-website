@@ -37,5 +37,5 @@ jobs:
       - name: Sync dist to S3
         run: aws s3 sync dist/ s3://${{ secrets.AWS_S3_BUCKET }} --delete
 
-      - name: invalidate the cache
+      - name: Invalidate the Cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
