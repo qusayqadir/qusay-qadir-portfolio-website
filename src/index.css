@@ -442,10 +442,12 @@ input[type='checkbox']:not(:checked) + div > .photo-row {
 .photo-row {
   display: flex;
   align-items: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 24px;
   margin-bottom: 20px;
   margin-top: 80px;
+  width: 100%;
 }
 
 .photo-circle-wrap {
