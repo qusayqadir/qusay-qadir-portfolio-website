@@ -12,14 +12,14 @@ export default function Experience() {
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-10">Previously</h1>
           <div className="flex flex-col gap-6">
             <CardSpotlightDemo
-              role="Software Engineering, Backend"
+              role="Software Engineer, Backend"
               company="RBC Borealis"
               location="Toronto, CAN"
               date="Jan 2026 – Present"
               description={
                 <>
                   Building on-premise cloud infrastructure ( Lumina Data Platform ).
-                  <br/>
+                  <br></br>
                   Designed and developed an API router to connect multiple microservice endpoints using Python and FastAPI with JSON Web Token authentication and authorization
                   for sub 1ms response time for the Auth Check of the API request, eliminating a latency bottleneck.
                   <br/><br/>
@@ -28,7 +28,7 @@ export default function Experience() {
               }
             />
             <CardSpotlightDemo
-              role="Software Engineering, Backend"
+              role="Software Engineer, Backend"
               company="Stealth AI Startup (Ex-Meta, Google, Databricks)"
               location="San Francisco, US"
               date="Jun 2025 – Jan 2026"
@@ -45,7 +45,7 @@ export default function Experience() {
               }
             />
             <CardSpotlightDemo
-              role="Software Engineering, ML & AI"
+              role="Software Engineer, ML & AI"
               company="McMaster Exoskeleton"
               location="Hamilton, CAN"
               date="Nov 2024 – Dec 2025"
@@ -61,7 +61,7 @@ export default function Experience() {
               }
             />
             <CardSpotlightDemo
-              role="Software Engineering, Data"
+              role="Software Engineer, Data"
               company="Scotiabank"
               location="Toronto, CAN"
               date="Apr 2024 – Sep 2024"
