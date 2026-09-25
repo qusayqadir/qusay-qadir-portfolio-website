@@ -53,6 +53,7 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 40px;
+  --crowd-h: 220px;
 }
 
 body {
@@ -67,6 +68,14 @@ body {
 a, p, h1, h2, h3 {
   font-size: var(--font-size);
   font-weight: normal;
+}
+
+/* Section subtitles — blue, bold, underlined (matches accent + dark logo) */
+h2 {
+  color: var(--secondary);
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 a {
@@ -138,21 +147,17 @@ section {
   flex-direction: column;
 }
 
-/* sticky scroll sections fill the viewport exactly */
-.scroll-section {
-  height: 100dvh;
-  min-height: unset;
-  overflow: hidden;
-  position: sticky;
-  top: 0;
-  /* Center the content when it fits, but if it overflows (e.g. browser
-     zoom > 100%), fall back to top-alignment so the section header is
-     NEVER clipped off the top. */
-  justify-content: safe center;
-}
-
 section:last-of-type {
   align-items: start;
+}
+
+/* Anchor these sections to the top so changing their content (expanding
+   "more about me", or switching the selected experience/project) adds height
+   below instead of re-centering and shifting what's already visible. */
+#about,
+#experience,
+#projects {
+  justify-content: flex-start;
 }
 
 section p {
@@ -217,41 +222,50 @@ h3 + a {
   margin-top: 40px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 2px;
 }
 
 /* ── Clickable list items ─────────────────────────────────── */
 
 .item {
-  /* Negative margins + matching padding = full-width bg without overflow clip issues */
+  /* Fixed, uniform width for every row so the hover fill is identical
+     regardless of text length (negative left margin keeps the text aligned). */
   padding: 6px var(--px);
   margin: 0 calc(var(--px) * -1);
-  width: calc(100% + var(--px) * 2);
+  width: min(380px, 100%);
   font-size: var(--font-size);
   line-height: 1.4rem;
   background-color: transparent;
   color: var(--text-primary);
   border-radius: 4px;
-  transition: background-color 0.2s ease, color 0.2s ease;
   user-select: none;
 }
 
+/* Keep both lines to one row (uniform height); overly long subtitles get
+   an ellipsis — the full text is shown in the detail panel on click. */
+.item-title,
 .item-sub {
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-sub {
   font-size: 0.75rem;
   color: var(--text-secondary);
   margin-top: 1px;
-  transition: color 0.32s ease;
 }
 
-
-.item.selected {
+/* Hover — black fill hugging the content (same behaviour as the blog list).
+   No transition, so moving between items is crisp, not snappy. */
+.item:hover {
   background-color: var(--nav-active-bg);
   color: var(--nav-active-text);
-  border-radius: 4px;
 }
 
-.item.selected .item-sub {
+.item:hover .item-sub {
   color: var(--nav-active-text);
   opacity: 0.65;
 }
@@ -409,6 +423,15 @@ input[type='checkbox']:not(:checked) + div > .photo-row {
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: lowercase;
+  user-select: none;
+}
+
+.proj-thumbnail {
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px dotted var(--border-dotted);
   user-select: none;
 }
 
@@ -767,6 +790,11 @@ section small {
     height: 140px;
   }
 
+  .proj-thumbnail {
+    width: 100%;
+    height: auto;
+  }
+
   /* Skills: tighter label column */
   .skill-row {
     gap: 14px;
@@ -787,4 +815,115 @@ section small {
     width: 150px;
     height: 150px;
   }
+}
+
+/* ── Landing = intro text + walking crowd in one viewport ──── */
+
+/* Shrink the name section so the crowd band below it stays on-screen, and
+   center the whole name/meta block horizontally (its text stays left-aligned). */
+#home {
+  min-height: unset;
+  height: calc(100dvh - var(--crowd-h));
+  align-items: center;
+}
+
+.crowd-band {
+  position: relative;
+  width: 100%;
+  height: var(--crowd-h);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.crowd-band canvas {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* The peeps art is black line-work; invert it so it reads on a dark bg. */
+:root.dark .crowd-band canvas {
+  filter: invert(1);
+}
+
+/* ── Blog index — item rows like experience/projects ──────── */
+
+.blog-back {
+  margin-top: 40px;
+  display: inline-block;
+}
+
+/* ── Blog post — sticky side-scroll navigation ────────────── */
+
+.blog-post {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 48px;
+  align-items: flex-start;
+  min-height: 100dvh;
+}
+
+.blog-side-nav {
+  position: sticky;
+  top: 40px;
+  flex-shrink: 0;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.blog-side-nav nav {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 20px;
+}
+
+.blog-side-nav nav span {
+  cursor: pointer;
+  color: var(--text-tertiary);
+  padding: 2px 0;
+  background: none;
+  transition: color 0.2s ease;
+}
+
+.blog-side-nav nav span.side-nav-active {
+  color: var(--secondary);
+  font-weight: bold;
+}
+
+.blog-content {
+  flex: 1;
+}
+
+.blog-meta {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  margin-top: 6px;
+}
+
+.blog-section {
+  padding: 40px 0;
+  min-height: 60dvh;
+  border-top: 1px dotted var(--border-dotted);
+}
+
+.blog-section h3 {
+  color: var(--secondary);
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.blog-section p { line-height: 1.7; }
+
+@media (max-width: 767px) {
+  .blog-post { flex-direction: column; gap: 20px; }
+  .blog-side-nav { position: static; width: 100%; top: auto; }
+  .blog-section { min-height: auto; }
 }
