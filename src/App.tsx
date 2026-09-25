@@ -1,5 +1,8 @@
 import { Analytics } from "@vercel/analytics/react"
+import { Routes, Route } from "react-router-dom"
 import Home from "@/pages/Home"
+import Blog from "@/pages/Blog"
+import BlogPost from "@/pages/BlogPost"
 import { ModeToggle } from "@/components/ui/mode-toggle"
 
 function App() {
@@ -27,7 +30,11 @@ function App() {
       <div style={{ position: 'fixed', top: '1rem', left: '1rem', zIndex: 1000 }}>
         <ModeToggle />
       </div>
-      <Home />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+      </Routes>
       <Analytics />
     </>
   )

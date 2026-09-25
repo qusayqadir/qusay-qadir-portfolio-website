@@ -1,15 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { GitHubCalendar } from 'react-github-calendar'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { CrowdCanvas } from '@/components/ui/crowd-canvas'
 import resumePdf from "@/assets/Qusay_Qadir_Backend_Engineer_2027Grad.pdf"
 
 const NAV_SECTIONS = ['about', 'experience', 'projects', 'github', 'resume', 'contact']
 
 const SKILLS = {
-  languages: ['Python', 'Java', 'SQL'],
-  backend: ['Django', 'FastAPI', 'FastMCP', 'GraphQL', `Redis`],
-  'data & ml': ['PostgreSQL', 'MongoDB', 'Apache Spark', 'Kafka', `LangChain/LangGraph/LangSmith`, `RAG`, `MCP`],
-  infra: ['AWS', `GCP`, `Docker`, 'OpenShift', 'Linux', 'Github'],
+  languages: ['Python', 'Go', 'Java', 'C++', 'SQL'],
+  backend: ['Django', 'FastAPI', 'FastMCP', 'GraphQL', `Redis`, 'Networking', 'TCP/UDP'],
+  'data': ['PostgreSQL', 'MongoDB', 'Kafka/Kineses', 'RabbitMQ', 'Apache Spark'],
+  'ml' : [`LangChain/LangGraph/LangSmith`, 'Clickhouse', `RAG`, `MCP`], 
+  infra: ['AWS', `Docker`, 'Linux - Bash', 'Git/Github'],
   tools: [`Claude Code`, `Windsurf`, `Postman`, ],
 }
 
@@ -57,55 +59,69 @@ const EXPERIENCE: ExpItem[] = [
 ]
 
 interface ProjItem {
-  id: string; title: string; year: string; status: string
+  id: string; title: string; year: string
   description: string; tech: string; github: string; link: string | null
+  thumbnail?: string
 }
 
 const PROJECTS: ProjItem[] = [
   {
-    id: 'f1', title: 'Formula-1 Bloomberg Terminal Engine', year: 'April 2026 - Present', status: 'WIP',
-    description: 'A centralized data platform for F1 enthusiasts, a data dense and LLM enabled web application to provide critical insights, dashboard features, and custom analytics graphs based off natural langauge queries. Experimented with RAG techniques like hybrid search (keyword and vectorbased), re-rank, MCP clients, and built a knowledge corpus. Managed agentic workflows using LangGraph. Provided users with an interactive live race dashboard with sub 5ms latency from real time that would allow them to view different racer telemetry data. Also a historical dashbaord which consisted of designing a batch datapipeline, database scheam design and endpoint delivery.' ,
-    tech: 'Python · PostgreSQL · LangGraph · MongoDB ',
-    github: 'https://github.com/qusayqadir', link: null,
+    id: 'ide3', title: 'IDE3.0', year: '2026',
+    description: 'An agent engineering intent model shared across a multi-agent session for coding AI assistants — capturing requirements, design constraints, quality, and test expectations.',
+    tech: 'Multi-Agent · LLM · MCP',
+    github: 'https://github.com/RishabShine/IDE3.0', link: null,
   },
   {
-    id: 'portfolio', title: 'Portfolio Website', year: 'March 2026 - Present', status: 'Live',
+    id: 'redis', title: 'Custom Redis in Go - Distributed System in AWS', year: '2026',
+    description: 'A custom Redis implementation built from scratch in Go, deployed as a distributed system on AWS.',
+    tech: 'Go · Redis · AWS · Distributed Systems',
+    github: 'https://github.com/qusayqadir/redis-custom-go', link: null,
+  },
+  {
+    id: 'f1', title: 'F1-Terminal Platform Engine', year: 'April 2026 - Present',
+    description: 'A data-dense, LLM-powered F1 platform with natural-language analytics, RAG-driven insights, and a live race dashboard streaming real-time telemetry at sub-5ms latency, plus historical batch data pipelines and dashboards.',
+    tech: 'Python · AWS · PostgreSQL · LangGraph · MongoDB ',
+    github: 'https://github.com/qusayqadir/formula-1-bloomberg', link: "https://d3bovki3k931ui.cloudfront.net/",
+    thumbnail: '/images/f1-bloomberg-thumbnail.png',
+  },
+  {
+    id: 'portfolio', title: 'Portfolio Website', year: 'March 2026 - Present',
     description: 'Personal portfolio website to show off experience and projects in React 19, TypeScript, and Tailwind CSS v4.',
     tech: 'TypeScript · React · Vite · Tailwind',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'http', title: 'Custom HTTP Framework', year: 'Feb 2026', status: 'WIP',
-    description: 'Building an HTTP framework from scratch on top of a raw TCP server, no frameworks, no abstractions. Understanding the full request/response lifecycle at the protocol level.',
-    tech: 'Python · TCP · HTTP',
-    github: 'https://github.com/qusayqadir', link: null,
+    id: 'leetcode', title: 'LeetCode Solutions in Python', year: '',
+    description: 'A growing collection of LeetCode problems solved in Python, organized along the NeetCode roadmap across core data structures and algorithms.',
+    tech: 'Python · Algorithms · Data Structures',
+    github: 'https://github.com/qusayqadir/leetcode-solutions-neetcode', link: null,
   },
   {
-    id: 'p2p', title: 'Peer to Peer Connection System', year: 'Feb 2026', status: 'Done',
+    id: 'p2p', title: 'Peer to Peer Connection System', year: 'Feb 2026',
     description: 'A decentralized peer-to-peer system enabling direct node-to-node communication with no central server handling peer discovery, connection management, and data transfer over raw sockets.',
     tech: 'Go · TCP · Sockets',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'mri', title: 'MRI Cognitive Classification', year: 'Oct 2025 - Dec 2025', status: 'Done',
+    id: 'mri', title: 'MRI Cognitive Classification', year: 'Oct 2025 - Dec 2025',
     description: 'Deep learning pipeline that classifies cognitive conditions from MRI brain scans using convolutional neural networks covering medical image preprocessing, augmentation, and model evaluation.',
     tech: 'Python · PyTorch · CNN · NumPy',
     github: 'https://github.com/qusayqadir', link: null,
   },
   {
-    id: 'drone', title: 'Autonomous Rescue Drone', year: 'Feb 2025 - Apri 2025', status: 'Done',
+    id: 'drone', title: 'Autonomous Rescue Drone', year: 'Feb 2025 - Apri 2025',
     description: 'Autonomous drone navigation system, implements an exploration command center that scouts an island map, locates points of interest, and returns mission data for a rescue simulation.',
     tech: 'Java · Software Design Patterns',
     github: 'https://github.com/qusayqadir/Rescue_Drone_AutoNav', link: null,
   },
   {
-    id: 'snake', title: 'Snake in C', year: 'Sept 2024', status: 'Done',
+    id: 'snake', title: 'Snake in C', year: 'Sept 2024',
     description: 'The classic Snake game written from scratch in C with real-time keyboard input, collision detection, and terminal rendering with ncurses.',
     tech: 'C · C++',
     github: 'https://github.com/qusayqadir/OOP-SnakeGame-C-', link: null,
   },
   {
-    id: 'spatial', title: '3D Spatial Mapping Embedded System', year: '2024', status: 'Done',
+    id: 'spatial', title: '3D Spatial Mapping Embedded System', year: '2024',
     description: 'An embedded system that reconstructs its surroundings as a 3D point cloud sweeping distance sensors on servo-driven actuators and mapping the environment in real time.',
     tech: 'C · Embedded · Sensors',
     github: 'https://github.com/qusayqadir', link: null,
@@ -116,14 +132,12 @@ const PROJECTS: ProjItem[] = [
 
 
 export default function Home() {
-  const isMobile = useIsMobile()
+  const navigate = useNavigate()
   const [active,     setActive]     = useState('about')
   const [expPanel,   setExpPanel]   = useState<string>(EXPERIENCE[0].id)
   const [projPanel,  setProjPanel]  = useState<string>(PROJECTS[0].id)
 
   const sparkleRef       = useRef<HTMLDivElement>(null)
-  const expWrapRef       = useRef<HTMLDivElement>(null)
-  const projWrapRef      = useRef<HTMLDivElement>(null)
   const suitRef          = useRef<HTMLDivElement>(null)
   const aboutExpandedRef = useRef<HTMLDivElement>(null)
 
@@ -140,33 +154,6 @@ export default function Home() {
     })
     return () => observers.forEach(o => o?.disconnect())
   }, [])
-
-  useEffect(() => {
-    if (isMobile) return  // no scroll-jacked panels on touch; items are tap-to-select
-    const onScroll = () => {
-      const ew = expWrapRef.current
-      if (ew) {
-        const { top, height } = ew.getBoundingClientRect()
-        const range = height - window.innerHeight
-        if (top <= 0 && -top <= range) {
-          const idx = Math.min(Math.floor((-top / range) * EXPERIENCE.length), EXPERIENCE.length - 1)
-          setExpPanel(EXPERIENCE[idx].id)
-        }
-      }
-      const pw = projWrapRef.current
-      if (pw) {
-        const { top, height } = pw.getBoundingClientRect()
-        const range = height - window.innerHeight
-        if (top <= 0 && -top <= range) {
-          const idx = Math.min(Math.floor((-top / range) * PROJECTS.length), PROJECTS.length - 1)
-          setProjPanel(PROJECTS[idx].id)
-        }
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [isMobile])
-
 
   useEffect(() => {
     const container = sparkleRef.current
@@ -186,69 +173,6 @@ export default function Home() {
     return () => window.removeEventListener('click', onClick)
   }, [])
 
-  // Scrolling down on the home section animates a jump to the about section.
-  // Everything else scrolls normally. The animation is self-driven so trackpad
-  // momentum can't interrupt it.
-  useEffect(() => {
-    if (isMobile) return  // wheel-jack is desktop-only; native touch scrolling on phones
-    let animating = false
-    let rafId = 0
-    const root = document.documentElement
-    const prevBehavior = root.style.scrollBehavior
-    root.style.scrollBehavior = 'auto'
-
-    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
-
-    const animateTo = (targetY: number) => {
-      cancelAnimationFrame(rafId)
-      animating = true
-      const startY = window.scrollY
-      const dist = targetY - startY
-      const dur = 600
-      const t0 = performance.now()
-      const step = (t: number) => {
-        const p = Math.min((t - t0) / dur, 1)
-        window.scrollTo(0, startY + dist * ease(p))
-        if (p < 1) rafId = requestAnimationFrame(step)
-        else animating = false
-      }
-      rafId = requestAnimationFrame(step)
-    }
-
-    const onWheel = (e: WheelEvent) => {
-      if (animating) { e.preventDefault(); return }  // don't let momentum interrupt the jump
-      const about = document.getElementById('about')
-      if (!about) return
-      const rect = about.getBoundingClientRect()
-      // only while on the home section (about still well below the fold) and scrolling down
-      if (e.deltaY > 0 && rect.top > window.innerHeight * 0.5) {
-        e.preventDefault()
-        animateTo(Math.max(0, rect.top + window.scrollY - 40))
-      }
-    }
-
-    window.addEventListener('wheel', onWheel, { passive: false })
-    return () => {
-      window.removeEventListener('wheel', onWheel)
-      cancelAnimationFrame(rafId)
-      root.style.scrollBehavior = prevBehavior
-    }
-  }, [isMobile])
-
-  useEffect(() => {
-    const detailTexts = document.querySelectorAll('.exp-detail-text')
-    if (detailTexts.length === 0) return
-
-    let maxHeight = 0
-    detailTexts.forEach(el => {
-      const height = (el as HTMLElement).scrollHeight
-      if (height > maxHeight) maxHeight = height
-    })
-
-    const root = document.documentElement
-    root.style.setProperty('--exp-detail-height', `${maxHeight}px`)
-  }, [])
-
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
@@ -265,6 +189,7 @@ export default function Home() {
             {s}
           </span>
         ))}
+        <span onClick={() => navigate('/blog')}>blog</span>
       </nav>
 
       <div className="sparkle" ref={sparkleRef} />
@@ -285,21 +210,26 @@ export default function Home() {
               <p>@ RBC Borealis</p>
             </div>
             <div className="meta-group">
-              <p className="meta-label">currently open for Fall 2026 &amp; Winter 2027 internship opportunities in</p>
+              <p className="meta-label">currently open for Winter 2027 &amp; Summer 2027 internship opportunities in</p>
               <br></br>
-              <p>Backend / Data / Database Software Engineer</p>
-              <p>AI / MLOps Engineer</p>
+              <p> Platform / Infrastructure / Backend  / Data Software Engineer</p>
+              <p> MLOps/ AI Engineer</p>
             </div>
           </div>
         </div>
       </section>
+
+      {/* ── CROWD (full-width, above the about break) ─────────── */}
+      <div className="crowd-band">
+        <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
+      </div>
 
       {/* ── ABOUT ─────────────────────────────
       ──────────────── */}
       <section id="about">
         <h2>about</h2>
 
-        <p>Hi, I'm Qusay. I like building systems, that involve Python, Databases, and Agents!</p>
+        <p>Hi, I'm Qusay. I like building systems, that involve Python, Databases, and Agents! Check out my <Link to="/blog">Technical Blog</Link>!</p>
 
         <div className="skills">
           {Object.entries(SKILLS).map(([category, items]) => (
@@ -358,63 +288,61 @@ export default function Home() {
       </section>
 
       {/* ── EXPERIENCE ──────────────────────────────────────── */}
-      <div id="experience" ref={expWrapRef}
-        style={{ minHeight: isMobile ? undefined : `${EXPERIENCE.length * 30 + 100}dvh` }}>
-        <section className={isMobile ? '' : 'scroll-section'}>
-          <h2>experience</h2>
-          <div className="item-list">
-            {EXPERIENCE.map(e => (
-              <div key={e.id}
-                onClick={isMobile ? () => setExpPanel(e.id) : undefined}
-                className={`item${expPanel === e.id ? ' selected' : ''}`}>
-                {e.company}
-                <span className="item-sub">{e.role} &middot; {e.period}</span>
-              </div>
-            ))}
-          </div>
-          <div className="exp-detail">
-            <div className="exp-detail-text" key={expPanel}>
-              <p><strong>{activeExp.company}</strong></p>
-              <p className="exp-role">{activeExp.role}</p>
-              <p className="exp-period">{activeExp.period} &middot; {activeExp.location}</p>
-              <p className="exp-desc">{activeExp.description}</p>
-              <p className="exp-tech">{activeExp.tech}</p>
+      <section id="experience">
+        <h2>experience</h2>
+        <div className="item-list">
+          {EXPERIENCE.map(e => (
+            <div key={e.id}
+              onClick={() => setExpPanel(e.id)}
+              className="item">
+              <span className="item-title">{e.company}</span>
+              <span className="item-sub">{e.role} &middot; {e.period}</span>
             </div>
-            <div className="exp-detail-spacer" />
+          ))}
+        </div>
+        <div className="exp-detail">
+          <div className="exp-detail-text">
+            <p><strong>{activeExp.company}</strong></p>
+            <p className="exp-role">{activeExp.role}</p>
+            <p className="exp-period">{activeExp.period} &middot; {activeExp.location}</p>
+            <p className="exp-desc">{activeExp.description}</p>
+            <p className="exp-tech">{activeExp.tech}</p>
           </div>
-        </section>
-      </div>
+          <div className="exp-detail-spacer" />
+        </div>
+      </section>
 
       {/* ── PROJECTS ────────────────────────────────────────── */}
-      <div id="projects" ref={projWrapRef}
-        style={{ minHeight: isMobile ? undefined : `${PROJECTS.length * 30 + 100}dvh` }}>
-        <section className={isMobile ? '' : 'scroll-section'}>
-          <h2>projects</h2>
-          <div className="item-list">
-            {PROJECTS.map(p => (
-              <div key={p.id}
-                onClick={isMobile ? () => setProjPanel(p.id) : undefined}
-                className={`item${projPanel === p.id ? ' selected' : ''}`}>
-                {p.title}
-                <span className="item-sub">{p.year} &middot; {p.status}</span>
-              </div>
-            ))}
-          </div>
-          <div className="proj-detail">
+      <section id="projects">
+        <h2>projects</h2>
+        <div className="item-list">
+          {PROJECTS.map(p => (
+            <div key={p.id}
+              onClick={() => setProjPanel(p.id)}
+              className="item">
+              <span className="item-title">{p.title}</span>
+              <span className="item-sub">{p.year}</span>
+            </div>
+          ))}
+        </div>
+        <div className="proj-detail">
+          {activeProj.thumbnail ? (
+            <img className="proj-thumbnail" src={activeProj.thumbnail} alt={activeProj.title} />
+          ) : (
             <div className="proj-placeholder">coming soon</div>
-            <div className="proj-text" key={projPanel}>
-              <p>{activeProj.description}</p>
-              <p className="proj-tech">{activeProj.tech}</p>
-              <div className="proj-links">
-                <a href={activeProj.github} target="_blank" rel="noopener noreferrer">github</a>
-                {activeProj.link && (
-                  <a href={activeProj.link} target="_blank" rel="noopener noreferrer">project link</a>
-                )}
-              </div>
+          )}
+          <div className="proj-text">
+            <p>{activeProj.description}</p>
+            <p className="proj-tech">{activeProj.tech}</p>
+            <div className="proj-links">
+              <a href={activeProj.github} target="_blank" rel="noopener noreferrer">github</a>
+              {activeProj.link && (
+                <a href={activeProj.link} target="_blank" rel="noopener noreferrer">project link</a>
+              )}
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       {/* ── GITHUB ──────────────────────────────────────────── */}
       <section id="github">
