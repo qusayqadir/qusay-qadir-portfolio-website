@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { GitHubCalendar } from 'react-github-calendar'
 import { CrowdCanvas } from '@/components/ui/crowd-canvas'
-import resumePdf from "@/assets/Qusay_Qadir_Backend_Engineer_2027Grad.pdf"
+import resumePdf from "@/assets/Qusay_Qadir_2028Grad_Backend.pdf"
 
 const NAV_SECTIONS = ['about', 'experience', 'projects', 'github', 'resume', 'contact']
 
