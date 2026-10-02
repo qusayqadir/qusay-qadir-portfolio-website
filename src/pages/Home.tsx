@@ -22,9 +22,16 @@ interface ExpItem {
 
 const EXPERIENCE: ExpItem[] = [
   {
-    id: 'rbc', company: 'RBC Borealis',
-    role: 'Software Engineer Intern (Agentic Observability)',
-    period: 'Jan 2026 – Present', location: 'Toronto, CAN',
+    id: 'rbc-ml', company: 'RBC Borealis',
+    role: 'Machine Learning Research Engineer Intern',
+    period: 'Sept 2026 - Present', location: 'Toronto, CAN',
+    description: 'Building an ml solution for detecting early onset anemia deficiency in women.', 
+    tech: 'Python · Date Engineering',
+  },
+  {
+    id: 'rbc-swe', company: 'RBC Borealis',
+    role: 'Software Engineer Intern',
+    period: 'Jan 2026 – Aug 2026', location: 'Toronto, CAN',
     description: 'Lumina Data Platform: Built evaluation pipelines for RBC Assist user interaction traces. Created APIs for RBC Assist prod canary testing, pii traces, and content behaviour safety. Engineering an API suite for an Email Alert Notification Service. Designed and developed API router connecting multiple microservice endpoints with JWT authentication, eliminating a latency bottleneck.',
     tech: 'Python · Go · FastAPI · Temporal · RedHat OpenShift · DBeaver · Postman',
   },

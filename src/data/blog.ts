@@ -17,35 +17,13 @@ export interface BlogPostData {
 export const BLOG_POSTS: BlogPostData[] = [
   {
     slug: 'blog-1',
-    title: 'Blog 1',
-    date: 'Coming soon',
+    title: 'The F1-Terminal Building Journey',
+    date: 'Oct 2, 2026',
     summary: 'Placeholder post — replace with your first technical write-up.',
     sections: [
       { id: 'intro', heading: 'Introduction', body: ['Add your content here.'] },
       { id: 'approach', heading: 'Approach', body: ['Add your content here.'] },
       { id: 'takeaways', heading: 'Takeaways', body: ['Add your content here.'] },
     ],
-  },
-  {
-    slug: 'blog-2',
-    title: 'Blog 2',
-    date: 'Coming soon',
-    summary: 'Placeholder post — replace with your second technical write-up.',
-    sections: [
-      { id: 'intro', heading: 'Introduction', body: ['Add your content here.'] },
-      { id: 'approach', heading: 'Approach', body: ['Add your content here.'] },
-      { id: 'takeaways', heading: 'Takeaways', body: ['Add your content here.'] },
-    ],
-  },
-  {
-    slug: 'blog-3',
-    title: 'Blog 3',
-    date: 'Coming soon',
-    summary: 'Placeholder post — replace with your third technical write-up.',
-    sections: [
-      { id: 'intro', heading: 'Introduction', body: ['Add your content here.'] },
-      { id: 'approach', heading: 'Approach', body: ['Add your content here.'] },
-      { id: 'takeaways', heading: 'Takeaways', body: ['Add your content here.'] },
-    ],
-  },
+  }
 ]
