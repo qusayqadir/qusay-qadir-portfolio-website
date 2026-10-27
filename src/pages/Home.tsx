@@ -22,6 +22,13 @@ interface ExpItem {
 
 const EXPERIENCE: ExpItem[] = [
   {
+    id: 'apera-ai', company: 'Apera AI',
+    role: 'Software Engineering (Incoming Winter 2027)',
+    period: 'Jan 2027', location: 'Toronto, CAN',
+    description: 'Simulation training for GPU-enabled 4D vision software; building the underlying infrastructure.',
+    tech: 'Python · AWS · Kubernetes',
+  },
+  {
     id: 'rbc', company: 'RBC Borealis',
     role: 'Software Engineer Intern (Agentic Observability)',
     period: 'Jan 2026 – Present', location: 'Toronto, CAN',
